@@ -17,6 +17,28 @@ This repository provides the minimal scaffold used by **Agent Control Plane** to
 1. Clone this repo (or let `agenctl init` do it for you).
 2. Edit `agent.yaml` (`name`, `description`, etc.).
 3. Extend the Pydantic request/response models in `main.py` and replace the logic in `invoke()`.
+
+   **Request contract**
+   - Body must include `user_uid` (string) and any other agent-specific fields.
+   - Gateway will add the header `X-Thread-Id: <uuid>` to each request.
+
+   **Response contract**
+   - JSON must include the same `thread_id` so audit logs can correlate request/response pairs.
+
+   Example curl (once the agent is behind the gateway):
+   ```bash
+   curl -X POST localhost:8080/my-agent \
+        -H 'Content-Type: application/json' \
+        -d '{"user_uid": "user-123", "prompt": "Hello"}'
+   ```
+   Response:
+   ```json
+   {
+     "thread_id": "550e8400-e29b-41d4-a716-446655440000",
+     "reply": "Echo: Hello",
+     "timestamp": "2025-06-16T09:34:00Z"
+   }
+   ```
 4. Build & run locally:
 
 ```bash
