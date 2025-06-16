@@ -31,6 +31,15 @@ curl -X POST localhost:8000/invoke -H 'Content-Type: application/json' \
      -d '{"prompt": "Hello"}'
 ```
 
+### Smoke tests
+
+Install pytest (dev-only dependency) and run the built-in checks:
+
+```bash
+pip install pytest
+pytest
+```
+
 ## Using in deployments
 
 In production you usually build & push the image, then reference it in the deployment bundle stored in [`agent-platform-deployments`](https://github.com/agentsystems/agent-platform-deployments`).
