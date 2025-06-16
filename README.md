@@ -19,8 +19,8 @@ This repository provides the minimal scaffold used by **Agent Control Plane** to
 3. Extend the Pydantic request/response models in `main.py` and replace the logic in `invoke()`.
 
    **Request contract**
-   - Body must include `user_uid` (string) and any other agent-specific fields.
-   - Gateway will add the header `X-Thread-Id: <uuid>` to each request.
+   - Client must include `Authorization: Bearer <token>` header (any placeholder for now).
+   - Gateway injects `X-Thread-Id: <uuid>` header before forwarding to the agent.
 
    **Response contract**
    - JSON must include the same `thread_id` so audit logs can correlate request/response pairs.
@@ -29,7 +29,7 @@ This repository provides the minimal scaffold used by **Agent Control Plane** to
    ```bash
    curl -X POST localhost:8080/my-agent \
         -H 'Content-Type: application/json' \
-        -d '{"user_uid": "user-123", "prompt": "Hello"}'
+        -d '{"prompt": "Hello"}'
    ```
    Response:
    ```json

@@ -34,7 +34,6 @@ app = FastAPI(title=NAME, version=VERSION)
 
 # ── Pydantic Schemas – replace with your own ─────────────────────────────────
 class InvokeRequest(BaseModel):
-    user_uid: str  # unique identifier for the end-user triggering the request
     prompt: str
 
 
