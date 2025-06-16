@@ -1,5 +1,12 @@
-# Template metadata for a new agent. Replace these fields after generation.
-name: your_agent_name
-version: 0.1.0
-owner: "Example Corp"
+# Template metadata for a new agent.
+# Replace placeholder values after scaffolding your own agent project.
+namespace: agentsystems            # Publisher / organization namespace
+name: your_agent_name              # Unique name within the namespace
+version: 0.1.0                     # Semantic version
+
 description: "Short description of what the agent does."
+
+# List of LLM or other model names required for this agent to run.
+model_dependencies:
+  - claude-sonnet-3.7
+  # - llama-3.3-70b
