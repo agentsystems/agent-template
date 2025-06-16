@@ -1,0 +1,5 @@
+# Template metadata for a new agent. Replace these fields after generation.
+name: your_agent_name
+version: 0.1.0
+owner: "Example Corp"
+description: "Short description of what the agent does."
