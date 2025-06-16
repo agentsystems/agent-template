@@ -31,14 +31,7 @@ curl -X POST localhost:8000/invoke -H 'Content-Type: application/json' \
      -d '{"prompt": "Hello"}'
 ```
 
-### Smoke tests
 
-Install pytest (dev-only dependency) and run the built-in checks:
-
-```bash
-pip install pytest
-pytest
-```
 
 ## Using in deployments
 
