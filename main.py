@@ -113,8 +113,13 @@ def get_historical_events_node(state: _SGState) -> _SGState:
 
 @log_thought("story_node")
 def story_node(state: _SGState) -> _SGState:
-    story = _chain_story.invoke({"date": state["date"], "events": state["historical_events"]})
-    state["story"] = story
+    story_result = _chain_story.invoke({"date": state["date"], "events": state["historical_events"]})
+    # LangChain may return an AIMessage; extract its content if present
+    if hasattr(story_result, "content"):
+        story_text = story_result.content
+    else:
+        story_text = str(story_result)
+    state["story"] = story_text
     return state
 
 graph.add_node("events", get_historical_events_node)
