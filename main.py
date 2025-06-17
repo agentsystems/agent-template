@@ -22,10 +22,6 @@ from langchain_anthropic import ChatAnthropic
 # Langfuse tracing handler (framework-agnostic)
 from langfuse.langchain import CallbackHandler
 
-# Initialise once; if LANGFUSE_* keys are missing the handler safely no-ops
-langfuse_handler = CallbackHandler()
-
-
 import pathlib
 
 import yaml
@@ -98,12 +94,12 @@ class _SGState(dict):
 graph = StateGraph(_SGState)
 
 def get_historical_events_node(state: _SGState) -> _SGState:
-    result = _chain_events.invoke({"date": state["date"]}, config={"callbacks": [langfuse_handler]})
+    result = _chain_events.invoke({"date": state["date"]})
     state["historical_events"] = result.get("events", [])
     return state
 
 def story_node(state: _SGState) -> _SGState:
-    story_result = _chain_story.invoke({"date": state["date"], "events": state["historical_events"]}, config={"callbacks": [langfuse_handler]})
+    story_result = _chain_story.invoke({"date": state["date"], "events": state["historical_events"]})
     # LangChain may return an AIMessage; extract its content if present
     if hasattr(story_result, "content"):
         story_text = story_result.content
@@ -125,7 +121,16 @@ async def invoke(request: Request, req: InvokeRequest) -> InvokeResponse:  # noq
     """Return three events for the given date and a short narrative."""
     thread_id = request.headers.get("X-Thread-Id", "")
     initial_state = {"date": req.date, "historical_events": []}
-    final_state: _SGState = _pipeline.invoke(initial_state)  # type: ignore[arg-type]
+    handler = CallbackHandler()
+    final_state: _SGState = _pipeline.invoke(
+        initial_state,
+        config={
+            "callbacks": [handler],
+            "metadata": {"langfuse_session_id": thread_id} if thread_id else {},
+        },
+    )  # type: ignore[arg-type]
+    # Attach control-plane thread_id to Langfuse trace as session_id
+
     return InvokeResponse(
         thread_id=thread_id,
         date=req.date,
