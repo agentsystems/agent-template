@@ -135,7 +135,8 @@ async def invoke(request: Request, req: InvokeRequest) -> InvokeResponse:  # noq
         thread_id=thread_id,
         date=req.date,
         events=final_state["historical_events"],
-        story=final_state.get("story", ""),
+        story=str(final_state.get("story", "")),
+
         timestamp=datetime.utcnow(),
     )
 
