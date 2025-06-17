@@ -19,7 +19,20 @@ from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langgraph.graph import StateGraph, END
 from langchain_anthropic import ChatAnthropic
-from agentsystems_sdk.observability import log_thought
+try:
+    from agentsystems_sdk.observability import log_thought
+except ImportError:
+    # Fallback no-op decorator when SDK is unavailable
+    def log_thought(arg=None):
+        """Simple no-op decorator compatible with @log_thought or @log_thought("name")."""
+        if callable(arg):
+            # Used as @log_thought
+            return arg
+        else:
+            # Used as @log_thought("name") – return decorator
+            def _decorator(fn):
+                return fn
+            return _decorator
 
 import pathlib
 
@@ -105,9 +118,9 @@ def story_node(state: _SGState) -> _SGState:
     return state
 
 graph.add_node("events", get_historical_events_node)
-graph.add_node("story", story_node)
-graph.add_edge("events", "story")
-graph.add_edge("story", END)
+graph.add_node("story_node", story_node)
+graph.add_edge("events", "story_node")
+graph.add_edge("story_node", END)
 graph.set_entry_point("events")
 _pipeline = graph.compile()
 
