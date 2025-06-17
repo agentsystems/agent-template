@@ -19,20 +19,20 @@ from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langgraph.graph import StateGraph, END
 from langchain_anthropic import ChatAnthropic
-try:
-    from agentsystems_sdk.observability import log_thought
-except ImportError:
-    # Fallback no-op decorator when SDK is unavailable
-    def log_thought(arg=None):
-        """Simple no-op decorator compatible with @log_thought or @log_thought("name")."""
-        if callable(arg):
-            # Used as @log_thought
-            return arg
-        else:
-            # Used as @log_thought("name") – return decorator
-            def _decorator(fn):
-                return fn
-            return _decorator
+# Langfuse tracing handler (framework-agnostic)
+from langfuse.langchain import CallbackHandler
+
+# Initialise once; if LANGFUSE_* keys are missing the handler safely no-ops
+langfuse_handler = CallbackHandler()
+
+# Optional no-op decorator retained for compatibility
+
+def log_thought(arg=None):
+    if callable(arg):
+        return arg
+    def _decorator(fn):
+        return fn
+    return _decorator
 
 import pathlib
 
@@ -105,15 +105,13 @@ class _SGState(dict):
 
 graph = StateGraph(_SGState)
 
-@log_thought("get_historical_events")
 def get_historical_events_node(state: _SGState) -> _SGState:
-    result = _chain_events.invoke({"date": state["date"]})
+    result = _chain_events.invoke({"date": state["date"]}, config={"callbacks": [langfuse_handler]})
     state["historical_events"] = result.get("events", [])
     return state
 
-@log_thought("story_node")
 def story_node(state: _SGState) -> _SGState:
-    story_result = _chain_story.invoke({"date": state["date"], "events": state["historical_events"]})
+    story_result = _chain_story.invoke({"date": state["date"], "events": state["historical_events"]}, config={"callbacks": [langfuse_handler]})
     # LangChain may return an AIMessage; extract its content if present
     if hasattr(story_result, "content"):
         story_text = story_result.content

@@ -6,3 +6,4 @@ langchain-core>=0.1.33
 langchain>=0.1.16
 langgraph>=0.0.39
 langchain-anthropic>=0.1.9
+langfuse>=2.11.0
