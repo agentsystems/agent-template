@@ -1,3 +1,9 @@
 fastapi>=0.110.2,<0.111
 uvicorn[standard]>=0.29,<0.30
 pyyaml>=6.0.1,<7
+python-dotenv>=1.0
+langchain-core>=0.1.33
+langchain>=0.1.16
+langgraph>=0.0.39
+langchain-anthropic>=0.1.9
+agentsystems-sdk[observe] @ git+https://github.com/agentsystems/agentsystems-sdk@main
