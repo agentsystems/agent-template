@@ -25,14 +25,6 @@ from langfuse.langchain import CallbackHandler
 # Initialise once; if LANGFUSE_* keys are missing the handler safely no-ops
 langfuse_handler = CallbackHandler()
 
-# Optional no-op decorator retained for compatibility
-
-def log_thought(arg=None):
-    if callable(arg):
-        return arg
-    def _decorator(fn):
-        return fn
-    return _decorator
 
 import pathlib
 
