@@ -27,7 +27,7 @@ This repository provides the minimal scaffold used by **Agent Control Plane** to
 
    Example curl (once the agent is behind the gateway):
    ```bash
-   curl -X POST localhost:8080/my-agent \
+   curl -X POST localhost:18080/my-agent \
         -H 'Content-Type: application/json' \
         -d '{"prompt": "Hello"}'
    ```
@@ -74,4 +74,4 @@ The Gateway will auto-discover the container and route `POST /my-agent` to its `
 
 ## Contributing
 
-Pull requests welcome! This repo is MIT-licensed so you can adapt it freely.
+Pull requests welcome!
