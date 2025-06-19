@@ -10,12 +10,10 @@ This repo is intended to be used via GitHub’s **“Use this template”** butt
 
 | Path / file | Purpose |
 |-------------|---------|
-| `main.py` | FastAPI app exposing `/invoke`, `/health`, `/docs`. Contains a stub `handle()` you should replace with your logic. |
-| `agent.yaml` | Declarative metadata (`name`, `description`, `port`) read by the Gateway for routing. |
-| `Dockerfile` | Multi-stage build (Python 3.12-slim) producing a small production image. |
+| `main.py` | FastAPI app exposing `/invoke`, `/health`, `/metadata`. Contains an `invoke()` function you can customise. |
+| `agent.yaml` | Declarative metadata (e.g. `name`, `description`) read by the Gateway for routing. |
+| `Dockerfile` | Slim Python 3.12 image that installs dependencies and runs the agent. |
 | `requirements.txt` | Runtime dependencies. |
-| `tests/` | Example pytest to show how to unit-test the `handle()` function. |
-| `.github/workflows/ci.yaml` | Optional CI that builds & pushes an image if you set secrets. |
 | Langfuse callback | `langfuse.langchain.CallbackHandler` pre-wired so every LangChain call is traced. |
 
 ---
@@ -46,7 +44,7 @@ sed -i '' 's/name:.*/name: echo-agent/' agent.yaml
 
 # install deps for local run
 python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt uvicorn
+pip install -r requirements.txt
 
 # run hot-reload server
 uvicorn main:app --reload --port 8000
@@ -89,7 +87,7 @@ The Gateway will now route `POST /echo-agent` to your container.
 | Var | Purpose |
 |-----|---------|
 | `LANGFUSE_PUBLIC_KEY` / `LANGFUSE_SECRET_KEY` | Needed for Langfuse tracing. |
-| Any model API keys | e.g. `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` – accessed in `handle()`. |
+| Any model API keys | e.g. `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` – accessed in `invoke()`. |
 
 ---
 
@@ -114,17 +112,6 @@ The Gateway will now route `POST /echo-agent` to your container.
 
 Issues and PRs are welcome – feel free to open a discussion if you need changes to the template.
 
-
-This repository provides the minimal scaffold used by **Agent Control Plane** to generate containerised FastAPI agents.
-
-## Contents
-
-| File / dir     | Purpose |
-| -------------- | ------------------------------------------------------------- |
-| `main.py`      | FastAPI entry-point implementing `/invoke`, `/health`, `/metadata`. |
-| `agent.yaml`   | Declarative metadata consumed by the control-plane. |
-| `Dockerfile`   | Reference Docker build (Python 3.12-slim + `requirements.txt`). |
-| `requirements.txt` | Runtime Python dependencies. |
 
 ## Getting Started (local)
 
@@ -172,7 +159,7 @@ curl -X POST localhost:8000/invoke -H 'Content-Type: application/json' \
 
 ## Using in deployments
 
-In production you usually build & push the image, then reference it in the deployment bundle stored in [`agent-platform-deployments`](https://github.com/agentsystems/agent-platform-deployments`).
+In production you usually build & push the image, then reference it in the deployment bundle stored in [`agent-platform-deployments`](https://github.com/agentsystems/agent-platform-deployments).
 
 ```
 # example snippet in compose/local/docker-compose.yml
@@ -185,8 +172,4 @@ my-agent:
 
 The Gateway will auto-discover the container and route `POST /my-agent` to its `/invoke` endpoint.
 
----
 
-## Contributing
-
-Pull requests welcome!
