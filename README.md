@@ -1,5 +1,120 @@
 # Agent Template
 
+The **Agent Template** is a minimal, batteries-included starter repo for building container-ised AI agents that plug into the [Agent Control Plane](https://github.com/agentsystems/agent-control-plane).
+
+This repo is intended to be used via GitHub’s **“Use this template”** button or the `gh repo create` CLI. It can also be cloned directly for experiments.
+
+---
+
+## What you get
+
+| Path / file | Purpose |
+|-------------|---------|
+| `main.py` | FastAPI app exposing `/invoke`, `/health`, `/docs`. Contains a stub `handle()` you should replace with your logic. |
+| `agent.yaml` | Declarative metadata (`name`, `description`, `port`) read by the Gateway for routing. |
+| `Dockerfile` | Multi-stage build (Python 3.12-slim) producing a small production image. |
+| `requirements.txt` | Runtime dependencies. |
+| `tests/` | Example pytest to show how to unit-test the `handle()` function. |
+| `.github/workflows/ci.yaml` | Optional CI that builds & pushes an image if you set secrets. |
+| Langfuse callback | `langfuse.langchain.CallbackHandler` pre-wired so every LangChain call is traced. |
+
+---
+
+## Where it fits
+
+```mermaid
+graph LR
+  client((Client)) --> gateway[Gateway]
+  gateway --> agent((Your-Agent))
+  agent --> lf[Langfuse]
+```
+
+1. Client calls `POST /your-agent` on the Gateway.
+2. Gateway forwards to your container’s `/invoke` endpoint and injects `X-Thread-Id`.
+3. Your code adds Langfuse traces and responds with JSON.
+
+---
+
+## Quick start
+
+```bash
+# fork / template
+gh repo create mycorp/echo-agent --template agentsystems/agent-template
+
+cd echo-agent
+sed -i '' 's/name:.*/name: echo-agent/' agent.yaml
+
+# install deps for local run
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt uvicorn
+
+# run hot-reload server
+uvicorn main:app --reload --port 8000
+```
+
+Visit <http://localhost:8000/docs> to try the endpoint.
+
+---
+
+## Build & run with Docker
+
+```bash
+docker build -t mycorp/echo-agent:0.1 .
+docker run -p 8000:8000 mycorp/echo-agent:0.1
+```
+
+---
+
+## Wire into a deployment
+
+Add the service to [`agent-platform-deployments`](https://github.com/agentsystems/agent-platform-deployments):
+
+```yaml
+# compose/local/docker-compose.yml
+  echo-agent:
+    image: mycorp/echo-agent:0.1
+    networks:
+      - agents-net
+    labels:
+      - agent.enabled=true
+      - agent.port=8000
+```
+
+The Gateway will now route `POST /echo-agent` to your container.
+
+---
+
+## Environment variables
+
+| Var | Purpose |
+|-----|---------|
+| `LANGFUSE_PUBLIC_KEY` / `LANGFUSE_SECRET_KEY` | Needed for Langfuse tracing. |
+| Any model API keys | e.g. `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` – accessed in `handle()`. |
+
+---
+
+## Tips & conventions
+
+* Keep the container port consistent (8080 or 8000); the Gateway connects over the internal Docker network, so host port mapping is optional.
+* Always return JSON with the `thread_id` you received – this keeps the audit log and Langfuse trace in sync.
+* Use the [Add a New Agent guide](../docs/guides/add-agent) when integrating into the full stack.
+
+---
+
+## Release checklist
+
+1. Update `version` label (if you tag images).  
+2. `docker build` & push to registry.  
+3. Update the image tag in the deployment manifests.  
+4. Run `make restart` (compose) or `helm upgrade` (k8s) to pick up the change.
+
+---
+
+## Contributing
+
+Issues and PRs are welcome – feel free to open a discussion if you need changes to the template.
+
+
 This repository provides the minimal scaffold used by **Agent Control Plane** to generate containerised FastAPI agents.
 
 ## Contents
