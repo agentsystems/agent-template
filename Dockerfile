@@ -11,7 +11,6 @@ RUN apt-get update \
     # Python deps
     && pip install --upgrade pip \
     && pip install --no-cache-dir -r /tmp/requirements.txt \
-    && pip install "agentsystems-sdk[observe] @ git+https://${GITHUB_TOKEN}:x-oauth-basic@github.com/agentsystems/agentsystems-sdk@main" \
     # cleanup
     && apt-get purge -y --auto-remove git \
     && rm -rf /var/lib/apt/lists/*
