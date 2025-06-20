@@ -1,5 +1,12 @@
 # Agent Template
 
+A minimal, batteries-included starter for building containerised AI agents that plug into the [Agent Systems](https://github.com/agentsystems) platform.
+
+*   Built on FastAPI + LangChain
+*   Comes with a Dockerfile and a `build_and_release.sh` wrapper
+*   No version tags or Docker image are published here – **this repo is a template**, not a distributable agent
+
+
 The **Agent Template** is a minimal, batteries-included starter repo for building container-ised AI agents that plug into the [Agent Control Plane](https://github.com/agentsystems/agent-control-plane).
 
 This repo is intended to be used via GitHub’s **“Use this template”** button or the `gh repo create` CLI. It can also be cloned directly for experiments.
@@ -35,31 +42,36 @@ graph LR
 
 ## Quick start
 
+1. Click **“Use this template”** on GitHub and create a new repository (e.g. `johndoe/echo-agent`).
+2. Clone your new repo and update `agent.yaml` (`name`, `description`, etc.).
+3. Start the agent locally with hot-reload:
+
 ```bash
-# fork / template
-gh repo create mycorp/echo-agent --template agentsystems/agent-template
-
-cd echo-agent
-sed -i '' 's/name:.*/name: echo-agent/' agent.yaml
-
-# install deps for local run
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-
-# run hot-reload server
 uvicorn main:app --reload --port 8000
 ```
 
-Visit <http://localhost:8000/docs> to try the endpoint.
+Open <http://localhost:8000/docs> to test the `/invoke` endpoint.
 
 ---
 
-## Build & run with Docker
+## Build & release a Docker image
+
+Use the wrapper script to build (and optionally push) a versioned multi-arch image:
 
 ```bash
-docker build -t mycorp/echo-agent:0.1 .
-docker run -p 8000:8000 mycorp/echo-agent:0.1
+./build_and_release.sh \
+  --image johndoe/echo-agent \
+  --version 0.1.0 \
+  --push          # omit --push to build locally only
 ```
+
+What it does:
+
+* Builds the container image and tags it `0.1.0` (plus `latest` if no suffix)
+* Pushes to Docker Hub when `--push` is present
+* Creates a Git tag **only** when you also pass `--git-tag`
 
 ---
 
