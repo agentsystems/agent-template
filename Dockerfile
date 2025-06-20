@@ -5,7 +5,6 @@ FROM python:3.12-slim
 
 # Install OS + Python deps
 COPY requirements.txt /tmp/
-ARG GITHUB_TOKEN
 RUN apt-get update \
     && apt-get install -y --no-install-recommends git \
     # Python deps
