@@ -127,6 +127,17 @@ echo "# Platforms      : $PLATFORM"
 echo "# Push after build: $PUSH"
 echo "# ------------------------------------------------------------"
 
+# ---- confirmation ---------------------------------------------------------
+read -r -p "Proceed with build and release? Type 'y' or 'yes' to continue: " CONFIRM
+case "${CONFIRM}" in
+  y|Y|yes|YES)
+    ;;
+  *)
+    echo "Aborted.";
+    exit 1;
+    ;;
+esac
+
 "${BUILD_CMD[@]}"
 
 echo "Image $IMAGE:$DOCKER_VERSION built successfully."
