@@ -86,6 +86,9 @@ _story_prompt = PromptTemplate(
 )
 _chain_story = _story_prompt | _llm
 
+# Langfuse callback handler – initialise once at startup
+langfuse_handler = CallbackHandler()
+
 class _SGState(dict):
     date: str
     historical_events: List[str]
@@ -113,7 +116,7 @@ graph.add_node("story_node", story_node)
 graph.add_edge("events", "story_node")
 graph.add_edge("story_node", END)
 graph.set_entry_point("events")
-_pipeline = graph.compile()
+_pipeline = graph.compile().with_config({"callbacks": [langfuse_handler]})
 
 
 @app.post("/invoke", response_model=InvokeResponse, tags=["Agent Ops"])
@@ -121,11 +124,9 @@ async def invoke(request: Request, req: InvokeRequest) -> InvokeResponse:  # noq
     """Return three events for the given date and a short narrative."""
     thread_id = request.headers.get("X-Thread-Id", "")
     initial_state = {"date": req.date, "historical_events": []}
-    handler = CallbackHandler()
     final_state: _SGState = _pipeline.invoke(
         initial_state,
         config={
-            "callbacks": [handler],
             "metadata": {"langfuse_session_id": thread_id} if thread_id else {},
         },
     )  # type: ignore[arg-type]
