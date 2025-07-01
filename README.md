@@ -55,7 +55,19 @@ uvicorn main:app --reload --port 8000
 Open <http://localhost:8000/docs> to test the `/invoke` endpoint.
 
 ---
+## Container health check
 
+AgentSystems CLI waits until Docker marks your container `healthy` before routing traffic. Add a simple `HEALTHCHECK` to your `Dockerfile` so the platform knows when the agent is ready:
+
+```dockerfile
+# after EXPOSE 8000
+ENV PORT 8000
+HEALTHCHECK --interval=10s --retries=3 CMD curl -sf http://localhost:${PORT}/health || exit 1
+```
+
+The template already exposes a `GET /health` endpoint that returns 200, so this works out of the box.
+
+---
 ## Build & release a Docker image
 
 Use the wrapper script to build (and optionally push) a versioned multi-arch image:
