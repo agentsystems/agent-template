@@ -125,9 +125,9 @@ The Gateway will now route `POST /echo-agent` to your container.
 
 ## Release checklist
 
-1. Update `version` label (if you tag images).  
-2. `docker build` & push to registry.  
-3. Update the image tag in the deployment manifests.  
+1. Update `version` label (if you tag images).
+2. `docker build` & push to registry.
+3. Update the image tag in the deployment manifests.
 4. Run `make restart` (compose) or `helm upgrade` (k8s) to pick up the change.
 
 ---

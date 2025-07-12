@@ -13,12 +13,14 @@ The runtime contract expected by the Agent Control Plane is:
 
 from datetime import datetime
 from typing import Any, Dict, List
-import os, logging
+import os
+import logging
 from dotenv import load_dotenv
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langgraph.graph import StateGraph, END
 from langchain_anthropic import ChatAnthropic
+
 # Langfuse tracing handler (framework-agnostic)
 from langfuse.langchain import CallbackHandler
 
@@ -31,7 +33,9 @@ from pydantic import BaseModel
 # ── Load static metadata once at startup ──────────────────────────────────────
 meta_path = pathlib.Path(__file__).with_name("agent.yaml")
 if not meta_path.exists():
-    raise FileNotFoundError("agent.yaml not found next to main.py – required by template")
+    raise FileNotFoundError(
+        "agent.yaml not found next to main.py – required by template"
+    )
 
 meta: Dict[str, Any] = yaml.safe_load(meta_path.read_text())
 NAME: str = meta.get("name", "UnnamedAgent")
@@ -73,7 +77,9 @@ _events_prompt = PromptTemplate(
     input_variables=["date"],
 )
 
-_llm = ChatAnthropic(model="claude-3-5-sonnet-latest", api_key=ANTHROPIC_API_KEY, temperature=0)
+_llm = ChatAnthropic(
+    model="claude-3-5-sonnet-latest", api_key=ANTHROPIC_API_KEY, temperature=0
+)
 _parser = JsonOutputParser()
 _chain_events = _events_prompt | _llm | _parser
 
@@ -89,20 +95,26 @@ _chain_story = _story_prompt | _llm
 # Langfuse callback handler – initialise once at startup
 langfuse_handler = CallbackHandler()
 
+
 class _SGState(dict):
     date: str
     historical_events: List[str]
     story: str
 
+
 graph = StateGraph(_SGState)
+
 
 def get_historical_events_node(state: _SGState) -> _SGState:
     result = _chain_events.invoke({"date": state["date"]})
     state["historical_events"] = result.get("events", [])
     return state
 
+
 def story_node(state: _SGState) -> _SGState:
-    story_result = _chain_story.invoke({"date": state["date"], "events": state["historical_events"]})
+    story_result = _chain_story.invoke(
+        {"date": state["date"], "events": state["historical_events"]}
+    )
     # LangChain may return an AIMessage; extract its content if present
     if hasattr(story_result, "content"):
         story_text = story_result.content
@@ -110,6 +122,7 @@ def story_node(state: _SGState) -> _SGState:
         story_text = str(story_result)
     state["story"] = story_text
     return state
+
 
 graph.add_node("events", get_historical_events_node)
 graph.add_node("story_node", story_node)
@@ -137,7 +150,6 @@ async def invoke(request: Request, req: InvokeRequest) -> InvokeResponse:  # noq
         date=req.date,
         events=final_state["historical_events"],
         story=str(final_state.get("story", "")),
-
         timestamp=datetime.utcnow(),
     )
 
