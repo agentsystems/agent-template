@@ -27,7 +27,7 @@ jobs:
         run: docker build -t agent-template .
 
       - name: Run container
-        run: docker run -d -p 9800:8080 --name agent-template-test agent-template
+        run: docker run -d -p 9800:8000 --name agent-template-test agent-template
 
       - name: Wait for /health to return 200
         run: |
