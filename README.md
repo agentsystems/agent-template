@@ -195,8 +195,3 @@ my-agent:
 ```
 
 The Gateway will auto-discover the container and route `POST /my-agent` to its `/invoke` endpoint.
-
-
-
-
-adding snapshot
