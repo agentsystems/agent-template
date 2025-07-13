@@ -195,3 +195,17 @@ my-agent:
 ```
 
 The Gateway will auto-discover the container and route `POST /my-agent` to its `/invoke` endpoint.
+
+---
+
+## Continuous Integration (GitHub Actions)
+
+The project ships with a `ci.yml` workflow that now goes beyond linting:
+
+1. Runs pre-commit hooks (ruff, black, shellcheck, hadolint).
+2. Builds the agent Docker image.
+3. Starts the container mapped to `localhost:9800` (internal port 8000).
+4. Polls `http://localhost:9800/health` for up to 60 s and fails the job if the endpoint never returns **200 OK**.
+5. Removes the container in a cleanup step.
+
+This guarantees that every PR produces an image that boots successfully and exposes the health endpoint.
