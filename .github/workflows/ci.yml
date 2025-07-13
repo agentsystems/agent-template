@@ -22,3 +22,22 @@ jobs:
 
       - name: Run pre-commit (all files)
         run: pre-commit run --all-files --show-diff-on-failure
+
+      - name: Build agent-template image
+        run: docker build -t agent-template .
+
+      - name: Run container
+        run: docker run -d -p 9800:8080 --name agent-template-test agent-template
+
+      - name: Wait for /health to return 200
+        run: |
+          for i in {1..30}; do
+            if curl -fs http://localhost:9800/health >/dev/null; then
+              echo "Service healthy"; exit 0; fi
+            sleep 2
+          done
+          echo "Health check failed" && docker logs agent-template-test && exit 1
+
+      - name: Cleanup
+        if: always()
+        run: docker rm -f agent-template-test || true
