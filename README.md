@@ -42,6 +42,19 @@ graph LR
 
 ## Quick start
 
+### Run via Docker Compose (spec-compliant)
+
+```bash
+# spins up both model-runner and the agent
+docker compose -f compose/docker-standard.yml up --build
+```
+
+After a few seconds check <http://localhost:8000/docs> for the swagger UI.
+
+---
+
+### Run with hot-reload (local python)
+
 1. Click **“Use this template”** on GitHub and create a new repository (e.g. `johndoe/echo-agent`).
 2. Clone your new repo and update `agent.yaml` (`name`, `description`, etc.).
 3. Start the agent locally with hot-reload:
