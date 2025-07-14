@@ -16,8 +16,6 @@ services:
     build:
       context: ..
     image: ${IMAGE_NAME:-yourorg/youragent:latest}
-    environment:
-      # Example: OPENAI_API_KEY gets passed through automatically when set.
 
     labels:
       com.docker.compose.ai.role: "agent"
