@@ -24,9 +24,16 @@ from langchain_anthropic import ChatAnthropic
 # Langfuse tracing handler (framework-agnostic)
 from langfuse.langchain import CallbackHandler
 
+# Progress reporting helper from agentsystems SDK
+try:
+    from agentsystems_sdk import progress_tracker as pt  # type: ignore
+except ImportError:  # Template may run before SDK installed
+    pt = None  # noqa: N818
+
 import pathlib
 
 import yaml
+import time
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
 
@@ -105,13 +112,38 @@ class _SGState(dict):
 graph = StateGraph(_SGState)
 
 
+def delay_node(state: _SGState) -> _SGState:
+    """Artificial 25-second delay split into 5 visible 5-second chunks."""
+    if not (pt and _thread_id):
+        time.sleep(25)
+        return state
+
+    for i in range(1, 6):
+        step_id = f"delay_{i}"
+        pct = 30 + i * 10  # 40,50,60,70,80
+        pt.update(current=step_id, state={step_id: "running"}, percent=pct)
+        time.sleep(5)
+        pt.update(state={step_id: "completed"}, percent=pct)
+    return state
+
+
 def get_historical_events_node(state: _SGState) -> _SGState:
+    # Mark the first step as running
+    if pt and _thread_id:
+        pt.update(current="events", state={"events": "running"}, percent=10)
+
     result = _chain_events.invoke({"date": state["date"]})
     state["historical_events"] = result.get("events", [])
+    if pt and _thread_id:
+        pt.update(state={"events": "completed", "delay": "queued"}, percent=30)
     return state
 
 
 def story_node(state: _SGState) -> _SGState:
+    if pt and _thread_id:
+        # events finished, story running
+        pt.update(state={"delay": "completed", "story_node": "running"}, percent=80)
+
     story_result = _chain_story.invoke(
         {"date": state["date"], "events": state["historical_events"]}
     )
@@ -121,12 +153,18 @@ def story_node(state: _SGState) -> _SGState:
     else:
         story_text = str(story_result)
     state["story"] = story_text
+    if pt and _thread_id:
+        pt.update(state={"story_node": "completed"}, percent=100, message="completed")
     return state
 
 
 graph.add_node("events", get_historical_events_node)
+graph.add_node("delay", delay_node)
 graph.add_node("story_node", story_node)
-graph.add_edge("events", "story_node")
+
+# Flow: events -> delay -> story_node
+graph.add_edge("events", "delay")
+graph.add_edge("delay", "story_node")
 graph.add_edge("story_node", END)
 graph.set_entry_point("events")
 _pipeline = graph.compile().with_config({"callbacks": [langfuse_handler]})
@@ -136,6 +174,21 @@ _pipeline = graph.compile().with_config({"callbacks": [langfuse_handler]})
 async def invoke(request: Request, req: InvokeRequest) -> InvokeResponse:  # noqa: D401
     """Return three events for the given date and a short narrative."""
     thread_id = request.headers.get("X-Thread-Id", "")
+    global _thread_id
+    _thread_id = thread_id  # expose to node functions
+
+    # --- Progress plan declaration ---
+    if pt and thread_id:
+        plan = [
+            {"id": "events", "label": "Fetch Historical Events"},
+            *[{"id": f"delay_{i}", "label": f"Wait {i*5}s"} for i in range(1, 6)],
+            {"id": "story_node", "label": "Compose Story"},
+        ]
+        pt.init(
+            thread_id,
+            plan=plan,
+            auth_header=request.headers.get("Authorization"),
+        )
     initial_state = {"date": req.date, "historical_events": []}
     final_state: _SGState = _pipeline.invoke(
         initial_state,
