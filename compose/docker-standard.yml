@@ -35,6 +35,8 @@ services:
   # Agent service.
   # ---------------------------------------------------------------------------
   agent:
+    build:
+      context: .
     image: ${IMAGE_NAME:-yourorg/youragent:latest}
     depends_on:
       model-runner:
