@@ -10,42 +10,15 @@
 
 services:
   # ---------------------------------------------------------------------------
-  # Model runner – lightweight gRPC/HTTP server that hosts the LLM weights.
-  # ---------------------------------------------------------------------------
-  model-runner:
-    image: ${MODEL_RUNNER_IMAGE:-docker/model-runner:latest}
-    # In the spec the role is declared via this label.
-    labels:
-      com.docker.compose.ai.role: "model-runner"
-      ai.docker.compose.spec: "v0.1"
-    # Workdir/entrypoint are already defined in the official image.
-    healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:8080/healthz"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
-    # Uncomment the block below if you want to reserve a GPU on compatible hosts
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - capabilities: ["gpu"]
-
-  # ---------------------------------------------------------------------------
   # Agent service.
   # ---------------------------------------------------------------------------
   agent:
     build:
       context: ..
     image: ${IMAGE_NAME:-yourorg/youragent:latest}
-    depends_on:
-      model-runner:
-        condition: service_healthy
     environment:
-      # URL where the agent can reach the model-runner.
-      - MODEL_SERVER_URL=http://model-runner:8080
-      # Overrideable placeholders for downstream env injection (e.g. OPENAI_KEY).
+      # Example: OPENAI_API_KEY gets passed through automatically when set.
+
     labels:
       com.docker.compose.ai.role: "agent"
       ai.docker.compose.spec: "v0.1"

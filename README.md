@@ -45,7 +45,6 @@ graph LR
 ### Run via Docker Compose (spec-compliant)
 
 ```bash
-# spins up both model-runner and the agent
 docker compose -f compose/docker-standard.yml up --build
 ```
 
