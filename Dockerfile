@@ -1,7 +1,7 @@
 # Generic Dockerfile for agents generated from agent-template
 # This uses a slim Python image and installs dependencies from requirements.txt.
 
-FROM python:3.12-slim
+FROM python:3.13-slim
 
 # Install OS + Python deps
 COPY requirements.txt /tmp/
