@@ -108,7 +108,7 @@ Add the service to [`agent-platform-deployments`](https://github.com/agentsystem
   echo-agent:
     image: mycorp/echo-agent:0.1
     networks:
-      - agents-net
+      - agents-int
     labels:
       - agent.enabled=true
       - agent.port=8000
