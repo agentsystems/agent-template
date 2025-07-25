@@ -71,6 +71,9 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 if not ANTHROPIC_API_KEY:
     logging.warning("ANTHROPIC_API_KEY not set – agent will error on invoke")
 
+# ── Artifacts volume convenience constant ────────────────────────────
+ARTIFACTS_ROOT = pathlib.Path("/artifacts") / os.getenv("AGENT_NAME", "agent")
+
 # Prompt for historical events (expects VALID JSON)
 _events_prompt = PromptTemplate(
     template=(
@@ -189,18 +192,34 @@ async def invoke(request: Request, req: InvokeRequest) -> InvokeResponse:  # noq
             plan=plan,
             auth_header=request.headers.get("Authorization"),
         )
-    initial_state = {"date": req.date, "historical_events": []}
+    # Resolve input date – prefer date.txt file in artifacts volume
+    in_file = ARTIFACTS_ROOT / "input" / thread_id / "date.txt"
+    if in_file.exists():
+        date_value = in_file.read_text().strip()
+    else:
+        date_value = req.date
+
+    initial_state = {
+        "date": date_value,
+        "historical_events": [],
+        "thread_id": thread_id,
+    }
     final_state: _SGState = _pipeline.invoke(
         initial_state,
         config={
             "metadata": {"langfuse_session_id": thread_id} if thread_id else {},
         },
     )  # type: ignore[arg-type]
+    # Persist story artifact to artifacts volume
+    out_dir = ARTIFACTS_ROOT / "output" / thread_id
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "story.txt").write_text(str(final_state.get("story", "")))
+
     # Attach control-plane thread_id to Langfuse trace as session_id
 
     return InvokeResponse(
         thread_id=thread_id,
-        date=req.date,
+        date=date_value,
         events=final_state["historical_events"],
         story=str(final_state.get("story", "")),
         timestamp=datetime.utcnow(),
