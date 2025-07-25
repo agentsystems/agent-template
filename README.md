@@ -127,6 +127,35 @@ The Gateway will now route `POST /echo-agent` to your container.
 
 ---
 
+## Artifacts volume
+
+Agents mount the shared read-only **input** folder and read-write **output** folder at:
+
+```
+/artifacts/<AGENT_NAME>/{input,output}/<THREAD_ID>/
+```
+
+Typical workflow:
+
+```bash
+# 1) Obtain / start a new run – CLI echoes THREAD_ID
+thread=$(agentsystems invoke my-agent --async)
+
+# 2) Stage the input file
+in_path=$(agentsystems artifacts-path --input --agent-name my-agent --thread-id "$thread")
+mkdir -p "$in_path" && cp ~/date.txt "$in_path/"
+
+# 3) Wait for the agent to finish (or poll status)
+
+# 4) Retrieve the output
+out_dir=$(agentsystems artifacts-path --agent-name my-agent --thread-id "$thread")
+cat "$out_dir/story.txt"
+```
+
+If `date.txt` is absent the agent falls back to the `date` field in the JSON body of the `/invoke` request.
+
+---
+
 ## Tips & conventions
 
 * Keep the container port consistent (8080 or 8000); the Gateway connects over the internal Docker network, so host port mapping is optional.
