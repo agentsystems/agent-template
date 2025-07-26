@@ -132,7 +132,7 @@ The Gateway will now route `POST /echo-agent` to your container.
 Agents mount the shared read-only **input** folder and read-write **output** folder at:
 
 ```
-/artifacts/<AGENT_NAME>/{input,output}/<THREAD_ID>/
+/artifacts/<THREAD_ID>/{in,out}/
 ```
 
 Typical workflow:
@@ -142,13 +142,13 @@ Typical workflow:
 thread=$(agentsystems invoke my-agent --async)
 
 # 2) Stage the input file
-in_path=$(agentsystems artifacts-path --input --agent-name my-agent --thread-id "$thread")
+in_path=$(agentsystems artifacts-path "$thread" --input)
 mkdir -p "$in_path" && cp ~/date.txt "$in_path/"
 
 # 3) Wait for the agent to finish (or poll status)
 
 # 4) Retrieve the output
-out_dir=$(agentsystems artifacts-path --agent-name my-agent --thread-id "$thread")
+out_dir=$(agentsystems artifacts-path "$thread")
 cat "$out_dir/story.txt"
 ```
 

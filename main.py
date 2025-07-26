@@ -72,7 +72,8 @@ if not ANTHROPIC_API_KEY:
     logging.warning("ANTHROPIC_API_KEY not set – agent will error on invoke")
 
 # ── Artifacts volume convenience constant ────────────────────────────
-ARTIFACTS_ROOT = pathlib.Path("/artifacts") / os.getenv("AGENT_NAME", "agent")
+# Thread-centric artifacts - no agent-specific directory needed
+ARTIFACTS_ROOT = pathlib.Path("/artifacts")
 
 # Prompt for historical events (expects VALID JSON)
 _events_prompt = PromptTemplate(
@@ -193,7 +194,8 @@ async def invoke(request: Request, req: InvokeRequest) -> InvokeResponse:  # noq
             auth_header=request.headers.get("Authorization"),
         )
     # Resolve input date – prefer date.txt file in artifacts volume
-    in_file = ARTIFACTS_ROOT / "input" / thread_id / "date.txt"
+    # Thread-centric path: /artifacts/{thread_id}/in/date.txt
+    in_file = ARTIFACTS_ROOT / thread_id / "in" / "date.txt"
     if in_file.exists():
         date_value = in_file.read_text().strip()
     elif req.date:
@@ -213,8 +215,8 @@ async def invoke(request: Request, req: InvokeRequest) -> InvokeResponse:  # noq
             "metadata": {"langfuse_session_id": thread_id} if thread_id else {},
         },
     )  # type: ignore[arg-type]
-    # Persist story artifact to artifacts volume
-    out_dir = ARTIFACTS_ROOT / "output" / thread_id
+    # Persist story artifact to artifacts volume (thread-centric path)
+    out_dir = ARTIFACTS_ROOT / thread_id / "out"
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "story.txt").write_text(str(final_state.get("story", "")))
 
