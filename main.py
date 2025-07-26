@@ -217,6 +217,7 @@ async def invoke(request: Request, req: InvokeRequest) -> InvokeResponse:  # noq
     )  # type: ignore[arg-type]
     # Persist story artifact to artifacts volume (thread-centric path)
     out_dir = ARTIFACTS_ROOT / thread_id / "out"
+    # Create the 'out' subdirectory - thread base directory created by gateway
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "story.txt").write_text(str(final_state.get("story", "")))
 
