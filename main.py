@@ -53,7 +53,7 @@ app = FastAPI(title=NAME, version=VERSION)
 
 # ── Pydantic Schemas – replace with your own ─────────────────────────────────
 class InvokeRequest(BaseModel):
-    date: str  # e.g. "April 1"
+    date: str | None = None  # e.g. "April 1" - optional if provided via file upload
 
 
 class InvokeResponse(BaseModel):
@@ -196,8 +196,11 @@ async def invoke(request: Request, req: InvokeRequest) -> InvokeResponse:  # noq
     in_file = ARTIFACTS_ROOT / "input" / thread_id / "date.txt"
     if in_file.exists():
         date_value = in_file.read_text().strip()
-    else:
+    elif req.date:
         date_value = req.date
+    else:
+        # Fallback if no date provided in JSON or file
+        date_value = "December 25"
 
     initial_state = {
         "date": date_value,
