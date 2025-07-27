@@ -198,10 +198,10 @@ async def invoke(request: Request, req: InvokeRequest) -> InvokeResponse:  # noq
     in_dir = ARTIFACTS_ROOT / thread_id / "in"
     if in_dir.exists():
         logging.info(
-            "artifact_input_dir_contents", files=[p.name for p in in_dir.iterdir()]
+            f"artifact_input_dir_contents: {[p.name for p in in_dir.iterdir()]}"
         )
     else:
-        logging.warning("artifact_input_dir_missing", path=str(in_dir))
+        logging.warning(f"artifact_input_dir_missing: {str(in_dir)}")
 
     # Thread-centric path: /artifacts/{thread_id}/in/date.txt
     in_file = in_dir / "date.txt"
