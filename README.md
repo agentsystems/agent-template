@@ -127,32 +127,71 @@ The Gateway will now route `POST /echo-agent` to your container.
 
 ---
 
-## Artifacts volume
+## File Uploads & Artifacts
 
-Agents mount the shared read-only **input** folder and read-write **output** folder at:
+Agents can receive file uploads and access shared artifacts through the `/artifacts` volume mounted at runtime. The platform uses a thread-centric structure where each request gets its own directory.
 
-```
-/artifacts/<THREAD_ID>/{in,out}/
-```
+### File Upload Workflow
 
-Typical workflow:
+Upload files using multipart requests to the gateway:
 
 ```bash
-# 1) Obtain / start a new run – CLI echoes THREAD_ID
-thread=$(agentsystems invoke my-agent --async)
-
-# 2) Stage the input file
-in_path=$(agentsystems artifacts-path "$thread" --input)
-mkdir -p "$in_path" && cp ~/date.txt "$in_path/"
-
-# 3) Wait for the agent to finish (or poll status)
-
-# 4) Retrieve the output
-out_dir=$(agentsystems artifacts-path "$thread")
-cat "$out_dir/story.txt"
+# Upload file with JSON payload
+curl -X POST http://localhost:18080/invoke/agent-template \
+  -H "Authorization: Bearer your-token" \
+  -F "file=@input.txt" \
+  -F 'json={"sync": true}'
 ```
 
-If `date.txt` is absent the agent falls back to the `date` field in the JSON body of the `/invoke` request.
+### Artifacts Directory Structure
+
+```
+/artifacts/
+├── {thread-id-1}/
+│   ├── in/          # Input files (uploaded by client)
+│   │   └── input.txt
+│   └── out/         # Output files (created by agent)
+│       └── result.txt
+└── {thread-id-2}/
+    ├── in/
+    └── out/
+```
+
+### Reading Input Files
+
+```python
+# In your agent's invoke() function
+thread_id = request.headers.get("X-Thread-Id", "")
+in_dir = pathlib.Path("/artifacts") / thread_id / "in"
+
+# Check for uploaded files
+if (in_dir / "data.txt").exists():
+    content = (in_dir / "data.txt").read_text()
+```
+
+### Writing Output Files
+
+```python
+# Create output directory and write results
+out_dir = pathlib.Path("/artifacts") / thread_id / "out"
+out_dir.mkdir(parents=True, exist_ok=True)
+(out_dir / "result.txt").write_text("Processing complete")
+```
+
+### Accessing Artifacts Outside Agents
+
+Check artifacts from any container with the volume mounted:
+
+```bash
+# List all threads
+docker exec local-gateway-1 ls -la /artifacts/
+
+# Read specific output file
+docker exec local-gateway-1 cat /artifacts/{thread-id}/out/result.txt
+
+# Use CLI helper
+agentsystems artifacts-path {thread-id} result.txt
+```
 
 ---
 
