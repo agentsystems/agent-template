@@ -194,8 +194,17 @@ async def invoke(request: Request, req: InvokeRequest) -> InvokeResponse:  # noq
             auth_header=request.headers.get("Authorization"),
         )
     # Resolve input date – prefer date.txt file in artifacts volume
+    # List contents of the thread-centric input directory for easier debugging
+    in_dir = ARTIFACTS_ROOT / thread_id / "in"
+    if in_dir.exists():
+        logging.info(
+            "artifact_input_dir_contents", files=[p.name for p in in_dir.iterdir()]
+        )
+    else:
+        logging.warning("artifact_input_dir_missing", path=str(in_dir))
+
     # Thread-centric path: /artifacts/{thread_id}/in/date.txt
-    in_file = ARTIFACTS_ROOT / thread_id / "in" / "date.txt"
+    in_file = in_dir / "date.txt"
     if in_file.exists():
         date_value = in_file.read_text().strip()
     elif req.date:
