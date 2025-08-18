@@ -6,7 +6,7 @@
 # -----------------------------------------------------------------------------
 # Builder stage – install deps and collect licenses
 # -----------------------------------------------------------------------------
-FROM python:3.13-slim AS builder
+FROM python:3.13.7-slim AS builder
 
 WORKDIR /build
 
@@ -86,7 +86,7 @@ RUN mkdir -p /licenses/debian \
 # -----------------------------------------------------------------------------
 # Final stage – minimal runtime image
 # -----------------------------------------------------------------------------
-FROM python:3.13-slim
+FROM python:3.13.7-slim
 
 ENV PYTHONUNBUFFERED=1
 WORKDIR /app
