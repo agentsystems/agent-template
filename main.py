@@ -67,9 +67,35 @@ class InvokeResponse(BaseModel):
 # ── Routes – minimal contract ────────────────────────────────────────────────
 # ── Build LangGraph pipeline once at startup ────────────────────────────────
 load_dotenv()
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-if not ANTHROPIC_API_KEY:
-    logging.warning("ANTHROPIC_API_KEY not set – agent will error on invoke")
+
+# Use AgentSystems Toolkit for model routing instead of hardcoded credentials
+try:
+    from agentsystems_toolkit import get_model
+
+    # Try to get configured model - falls back to hardcoded if not configured
+    try:
+        _llm = get_model("claude-sonnet-4", "langchain", temperature=0)
+        logging.info("Using model routing via agentsystems-toolkit")
+    except (FileNotFoundError, ValueError) as e:
+        logging.warning(
+            f"Model routing not available ({e}), falling back to direct credentials"
+        )
+        # Fallback to direct credentials for backward compatibility
+        ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+        if not ANTHROPIC_API_KEY:
+            logging.warning("ANTHROPIC_API_KEY not set – agent will error on invoke")
+        _llm = ChatAnthropic(
+            model="claude-3-5-sonnet-latest", api_key=ANTHROPIC_API_KEY, temperature=0
+        )
+except ImportError:
+    logging.warning("agentsystems-toolkit not available, using direct credentials")
+    # Fallback to direct credentials
+    ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+    if not ANTHROPIC_API_KEY:
+        logging.warning("ANTHROPIC_API_KEY not set – agent will error on invoke")
+    _llm = ChatAnthropic(
+        model="claude-3-5-sonnet-latest", api_key=ANTHROPIC_API_KEY, temperature=0
+    )
 
 # ── Artifacts volume convenience constant ────────────────────────────
 # Thread-centric artifacts - no agent-specific directory needed
@@ -88,9 +114,7 @@ _events_prompt = PromptTemplate(
     input_variables=["date"],
 )
 
-_llm = ChatAnthropic(
-    model="claude-3-5-sonnet-latest", api_key=ANTHROPIC_API_KEY, temperature=0
-)
+# _llm is now defined above in the model routing section
 _parser = JsonOutputParser()
 _chain_events = _events_prompt | _llm | _parser
 
