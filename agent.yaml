@@ -8,5 +8,5 @@ description: "Short description of what the agent does."
 
 # List of LLM or other model names required for this agent to run.
 model_dependencies:
-  - claude-sonnet-3.7
+  - claude-sonnet-4
   # - llama-3.3-70b
