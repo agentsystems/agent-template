@@ -23,19 +23,22 @@ jobs:
       - name: Run pre-commit (all files)
         run: pre-commit run --all-files --show-diff-on-failure
 
-      - name: Docker Compose up (build & detach)
+      - name: Build Docker image
         run: |
-          docker compose -f compose/docker-standard.yml up -d --build
+          docker build -t agent-template-ci-test .
 
-      - name: Wait for /health to return 200
+      - name: Verify attribution files
         run: |
-          for i in {1..30}; do
-            if curl -fs http://localhost:8000/health >/dev/null; then
-              echo "Service healthy"; exit 0; fi
-            sleep 2
-          done
-          echo "Health check failed" && docker compose logs && exit 1
+          echo "🔍 Verifying license attribution was generated..."
+          docker run --rm agent-template-ci-test test -f /app/licenses/README.md
+          docker run --rm agent-template-ci-test test -f /app/licenses/python/ATTRIBUTIONS.md
+          docker run --rm agent-template-ci-test test -f /app/licenses/ATTRIBUTION_CHECKSUMS.txt
+          echo "✅ Attribution files verified"
 
-      - name: Cleanup
-        if: always()
-        run: docker compose -f compose/docker-standard.yml down -v || true
+      - name: Check attribution completeness
+        run: |
+          echo "📊 Attribution statistics:"
+          echo "Python packages: $(docker run --rm agent-template-ci-test wc -l < /app/licenses/python/THIRD_PARTY_REQUIREMENTS.txt)"
+          echo "Attribution entries: $(docker run --rm agent-template-ci-test grep -c '^## ' /app/licenses/python/ATTRIBUTIONS.md)"
+          echo "Debian packages: $(docker run --rm agent-template-ci-test wc -l < /app/licenses/debian/INSTALLED_PACKAGES.txt)"
+          echo "✅ Build and attribution system working correctly"

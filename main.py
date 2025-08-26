@@ -13,13 +13,14 @@ The runtime contract expected by the Agent Control Plane is:
 
 from datetime import datetime
 from typing import Any, Dict, List
-import os
 import logging
 from dotenv import load_dotenv
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langgraph.graph import StateGraph, END
-from langchain_anthropic import ChatAnthropic
+
+# AgentSystems model routing - no fallbacks to force proper configuration
+from agentsystems_toolkit import get_model
 
 # Langfuse tracing handler (framework-agnostic)
 from langfuse.langchain import CallbackHandler
@@ -68,34 +69,9 @@ class InvokeResponse(BaseModel):
 # ── Build LangGraph pipeline once at startup ────────────────────────────────
 load_dotenv()
 
-# Use AgentSystems Toolkit for model routing instead of hardcoded credentials
-try:
-    from agentsystems_toolkit import get_model
-
-    # Try to get configured model - falls back to hardcoded if not configured
-    try:
-        _llm = get_model("claude-sonnet-4", "langchain", temperature=0)
-        logging.info("Using model routing via agentsystems-toolkit")
-    except (FileNotFoundError, ValueError) as e:
-        logging.warning(
-            f"Model routing not available ({e}), falling back to direct credentials"
-        )
-        # Fallback to direct credentials for backward compatibility
-        ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-        if not ANTHROPIC_API_KEY:
-            logging.warning("ANTHROPIC_API_KEY not set – agent will error on invoke")
-        _llm = ChatAnthropic(
-            model="claude-3-5-sonnet-latest", api_key=ANTHROPIC_API_KEY, temperature=0
-        )
-except ImportError:
-    logging.warning("agentsystems-toolkit not available, using direct credentials")
-    # Fallback to direct credentials
-    ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-    if not ANTHROPIC_API_KEY:
-        logging.warning("ANTHROPIC_API_KEY not set – agent will error on invoke")
-    _llm = ChatAnthropic(
-        model="claude-3-5-sonnet-latest", api_key=ANTHROPIC_API_KEY, temperature=0
-    )
+# Get configured model - will fail if not properly configured
+_llm = get_model("claude-sonnet-4", "langchain", temperature=0)
+logging.info("Using model routing via agentsystems-toolkit")
 
 # ── Artifacts volume convenience constant ────────────────────────────
 # Thread-centric artifacts - no agent-specific directory needed
