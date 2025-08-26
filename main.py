@@ -70,7 +70,11 @@ class InvokeResponse(BaseModel):
 load_dotenv()
 
 # Get configured model - will fail if not properly configured
+# The toolkit automatically routes to the correct provider based on platform configuration
 _llm = get_model("claude-sonnet-4", "langchain", temperature=0)
+# _llm = get_model("gpt-5-nano", "langchain", temperature=0)
+# _llm = get_model("llama-3-3-70b", "langchain", temperature=0)
+
 logging.info("Using model routing via agentsystems-toolkit")
 
 # ── Artifacts volume convenience constant ────────────────────────────
@@ -117,16 +121,16 @@ graph = StateGraph(_SGState)
 
 
 def delay_node(state: _SGState) -> _SGState:
-    """Artificial 25-second delay split into 5 visible 5-second chunks."""
+    """Small 2-second delay split into 2 visible 1-second chunks."""
     if not (pt and _thread_id):
-        time.sleep(25)
+        time.sleep(2)
         return state
 
-    for i in range(1, 6):
+    for i in range(1, 3):
         step_id = f"delay_{i}"
-        pct = 30 + i * 10  # 40,50,60,70,80
+        pct = 30 + i * 25  # 55, 80
         pt.update(current=step_id, state={step_id: "running"}, percent=pct)
-        time.sleep(5)
+        time.sleep(1)
         pt.update(state={step_id: "completed"}, percent=pct)
     return state
 
@@ -185,7 +189,7 @@ async def invoke(request: Request, req: InvokeRequest) -> InvokeResponse:  # noq
     if pt and thread_id:
         plan = [
             {"id": "events", "label": "Fetch Historical Events"},
-            *[{"id": f"delay_{i}", "label": f"Wait {i*5}s"} for i in range(1, 6)],
+            *[{"id": f"delay_{i}", "label": f"Wait {i}s"} for i in range(1, 3)],
             {"id": "story_node", "label": "Compose Story"},
         ]
         pt.init(

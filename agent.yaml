@@ -7,6 +7,8 @@ version: 0.1.0                     # Semantic version
 description: "Short description of what the agent does."
 
 # List of LLM or other model names required for this agent to run.
+# These should match the model IDs you use in get_model() calls in main.py
 model_dependencies:
   - claude-sonnet-4
-  # - llama-3.3-70b
+  # - gpt-5-nano
+  # - llama-3-3-70b
