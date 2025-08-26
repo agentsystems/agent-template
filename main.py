@@ -25,10 +25,10 @@ from agentsystems_toolkit import get_model
 # Langfuse tracing handler (framework-agnostic)
 from langfuse.langchain import CallbackHandler
 
-# Progress reporting helper from agentsystems SDK
+# Progress reporting helper from agentsystems toolkit
 try:
-    from agentsystems_sdk import progress_tracker as pt  # type: ignore
-except ImportError:  # Template may run before SDK installed
+    from agentsystems_toolkit import progress_tracker as pt  # type: ignore
+except ImportError:  # Graceful degradation if progress tracking not available
     pt = None  # noqa: N818
 
 import pathlib
