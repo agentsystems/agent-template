@@ -7,7 +7,5 @@ langchain>=0.1.16
 langgraph>=0.0.39
 langchain-anthropic>=0.1.9
 langfuse>=2.11.0
-# Use >=0.2.18; 0.2.19 may take a few minutes to appear on PyPI mirrors
-agentsystems-sdk>=0.2.18,<0.3
-# Model routing toolkit for user-configured model connections
-agentsystems-toolkit[langchain]>=0.1.1
+# Agent runtime toolkit for model routing and progress tracking
+agentsystems-toolkit[langchain]>=0.1.2
