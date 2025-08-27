@@ -11,4 +11,5 @@ description: "Short description of what the agent does."
 model_dependencies:
   - claude-sonnet-4
   # - gpt-5-nano
-  # - llama-3-3-70b
+  # - llama3.3:70b
+  # - gemma3:4b

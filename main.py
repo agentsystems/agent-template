@@ -73,7 +73,8 @@ load_dotenv()
 # The toolkit automatically routes to the correct provider based on platform configuration
 _llm = get_model("claude-sonnet-4", "langchain", temperature=0)
 # _llm = get_model("gpt-5-nano", "langchain", temperature=0)
-# _llm = get_model("llama-3-3-70b", "langchain", temperature=0)
+# _llm = get_model("llama3.3:70b", "langchain", temperature=0)
+# _llm = get_model("gemma3:4b", "langchain", temperature=0)
 
 logging.info("Using model routing via agentsystems-toolkit")
 
