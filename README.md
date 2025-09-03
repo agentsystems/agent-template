@@ -85,7 +85,7 @@ ENV PORT 8000
 HEALTHCHECK --interval=10s --retries=3 CMD curl -sf http://localhost:${PORT}/health || exit 1
 ```
 
-The template already exposes a `GET /health` endpoint that returns 200, so this works out of the box.
+The template exposes a `GET /health` endpoint that returns 200, so the example healthcheck will work with the default app.
 
 ---
 ## Build & release a Docker image
@@ -122,7 +122,7 @@ Add the service to [`agent-platform-deployments`](https://github.com/agentsystem
       - agent.port=8000
 ```
 
-The Gateway will now route `POST /echo-agent` to your container.
+The Gateway should now route `POST /echo-agent` to your container (once the container is healthy and registered).
 
 ---
 
@@ -206,7 +206,7 @@ agentsystems artifacts-path {thread-id} result.txt
 ## Tips & conventions
 
 * Keep the container port consistent (8080 or 8000); the Gateway connects over the internal Docker network, so host port mapping is optional.
-* Always return JSON with the `thread_id` you received – this keeps the audit log and Langfuse trace in sync.
+* You should return JSON with the `thread_id` you received – this keeps the audit log and Langfuse trace in sync.
 * Use the [Add a New Agent guide](../docs/guides/add-agent) when integrating into the full stack.
 
 ---
@@ -300,4 +300,4 @@ This helps verify that PRs produce images that boot successfully and expose the 
 
 ## License
 
-All use of this software is governed by the [LICENSE](LICENSE).
+Licensed under the [Apache-2.0 license](./LICENSE).

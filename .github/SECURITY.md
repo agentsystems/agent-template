@@ -1,6 +1,6 @@
 # Security Policy
 
-Please report all security issues privately via **security@agentsystems.ai**. We will acknowledge within 2 business days and strive to fix confirmed issues promptly.
+Please report all security issues privately via **security@agentsystems.ai**. We aim to acknowledge within 2 business days; timelines are aspirational and not a commitment.
 
 ## Supported Versions
 Only the latest minor release of `agent-template` receives security patches.
