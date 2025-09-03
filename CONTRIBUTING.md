@@ -1,30 +1,67 @@
-# Contributing to `agent-template`
+# Contributing to Agent Template
 
-Thank you for improving the Agent Template!  This repo is the starting point for new Agents, so keeping it lint-clean and easy to onboard is critical.
+Thank you for your interest in contributing to AgentSystems! This project consists of multiple repositories working together to provide a complete AI agent platform.
 
----
-## Dev environment setup
+## Repository Structure
 
+AgentSystems is organized into several focused repositories:
+
+- **[agentsystems](https://github.com/agentsystems/agentsystems)** - Main documentation and platform overview
+- **[agent-control-plane](https://github.com/agentsystems/agent-control-plane)** - Gateway and orchestration services
+- **[agentsystems-sdk](https://github.com/agentsystems/agentsystems-sdk)** - CLI and deployment tools
+- **[agentsystems-ui](https://github.com/agentsystems/agentsystems-ui)** - Web interface
+- **[agentsystems-toolkit](https://github.com/agentsystems/agentsystems-toolkit)** - Development libraries
+- **[agent-template](https://github.com/agentsystems/agent-template)** - Reference implementation (this repo)
+
+## Getting Started
+
+### Development Setup
 ```bash
-# 1. (optional) create a Python virtualenv
+# Clone and setup
+git clone https://github.com/agentsystems/agent-template.git
+cd agent-template
+
+# Create virtual environment
 python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
 
-# 2. install dev dependencies and git hooks
-pip install -r requirements-dev.txt
-pre-commit install
+# Start development server
+uvicorn main:app --reload --port 8000
 
-# 3. lint the full repo (auto-fix imports, formatting, etc.)
-pre-commit run --all-files
+# Test the agent
+curl -X POST http://localhost:8000/invoke -d '{"date": "July 4"}'
 ```
 
-The hooks run automatically on every `git commit` and include **ruff**, **black**, **shellcheck**, and **hadolint** to enforce consistent style.
+### Making Changes
+1. **Fork** this repository
+2. **Create a feature branch** from main
+3. **Make your changes** with appropriate tests
+4. **Submit a pull request** with a clear description
 
----
-## Opening a PR
+## Code Standards
 
-1. Keep changes focused – one feature or bug-fix per PR.
-2. Add tests if you add behaviour.
-3. Ensure `pre-commit run --all-files` exits with code 0.
-4. Use conventional commits (`feat: …`, `fix: …`, `chore: …`).
+- Follow the existing code style in each repository
+- Include tests for new functionality
+- Update documentation as needed
+- Use clear, descriptive commit messages
+- Add type hints to all new functions
+- Include docstrings for public APIs
 
-Happy hacking!
+## Pull Request Process
+
+1. Update documentation if you're changing functionality
+2. Add tests for new features
+3. Ensure all CI checks pass
+4. Request review from maintainers
+
+## Community Guidelines
+
+Please read our [Code of Conduct](CODE_OF_CONDUCT.md) to understand our community standards.
+
+## Questions?
+
+- **General questions**: Open a discussion in the [main repository](https://github.com/agentsystems/agentsystems)
+- **Bug reports**: Create an issue in this repository
+- **Real-time chat**: Join our [Discord community](https://discord.gg/gkfwXsBb)
+
+We appreciate all contributions, from typo fixes to major features!

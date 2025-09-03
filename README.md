@@ -1,5 +1,13 @@
 # Agent Template
 
+[![GitHub stars](https://img.shields.io/github/stars/agentsystems/agentsystems?style=flat-square&logo=github)](https://github.com/agentsystems/agentsystems/stargazers)
+
+> [!NOTE]
+> **Public Beta** - Part of the AgentSystems platform. Official public launch September 15, 2025.
+> ⭐ [**Star the main repository**](https://github.com/agentsystems/agentsystems) to show your support!
+
+> This is the **reference agent template** for AgentSystems. See the [main repository](https://github.com/agentsystems/agentsystems) for platform overview and documentation.
+
 A minimal, batteries-included starter for building containerised AI agents that plug into the [Agent Systems](https://github.com/agentsystems) platform.
 
 *   Built on FastAPI + LangChain
@@ -288,4 +296,8 @@ The project ships with a `ci.yml` workflow that now goes beyond linting:
 4. Polls `http://localhost:9800/health` for up to 60 s and fails the job if the endpoint never returns **200 OK**.
 5. Removes the container in a cleanup step.
 
-This guarantees that every PR produces an image that boots successfully and exposes the health endpoint.
+This helps verify that PRs produce images that boot successfully and expose the health endpoint.
+
+## License
+
+All use of this software is governed by the [LICENSE](LICENSE).
