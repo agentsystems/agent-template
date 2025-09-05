@@ -90,6 +90,8 @@ _events_prompt = PromptTemplate(
         Return exactly 3 historical events that occurred on this month/day: {date}
 
         Expected format:\n{{\n  \"events\": [ \"Event #1\", \"Event #2\", \"Event #3\" ] }}
+
+        Ensure that the selected historical events are family friendly and appropriate to be thoroughly discussed with people of all ages and backgrounds.
         """
     ),
     input_variables=["date"],
@@ -103,6 +105,7 @@ _story_prompt = PromptTemplate(
     template="""
     Compose a concise, engaging narrative (max 120 words) weaving these historical events together on {date}:
     {events}
+    Ensure that all content is family friendly and appropriate for people of all ages and backgrounds.
     """,
     input_variables=["date", "events"],
 )
