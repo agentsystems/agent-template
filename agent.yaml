@@ -1,15 +1,34 @@
-# Template metadata for a new agent.
-# Replace placeholder values after scaffolding your own agent project.
-namespace: agentsystems            # Publisher / organization namespace
-name: your_agent_name              # Unique name within the namespace
-version: 0.1.0                     # Semantic version
+# AgentSystems Agent Metadata
+#
+# This file defines your agent's metadata and requirements.
+# The AgentSystems platform reads this to:
+# - Display your agent in the UI
+# - Reference required model dependencies
+# - Route requests to your agent
 
-description: "Short description of what the agent does."
+# Publisher/organization namespace (e.g., "mycompany", "github-username")
+namespace: agentsystems
 
-# List of LLM or other model names required for this agent to run.
-# These should match the model IDs you use in get_model() calls in main.py
+# Agent name - must be unique within your namespace
+# Used in URLs: http://gateway:18080/invoke/{name}
+name: historical-events-agent
+
+# Semantic version (major.minor.patch)
+version: 0.1.0
+
+# Short description displayed in the AgentSystems UI
+description: "Returns historical events for a date and weaves them into a narrative story"
+
+# Model dependencies - list all models used in your agent code
+# The platform operator must configure these models before your agent can run
+# These should match the model IDs in your get_model() calls in main.py
 model_dependencies:
-  - claude-sonnet-4
-  # - gpt-5-nano
-  # - llama3.3:70b
-  # - gemma3:4b
+  - gemma3:1b
+
+# Examples of other models you might use:
+# - claude-sonnet-4
+# - gpt-5-nano
+# - llama3.3:70b
+# - nova-pro
+#
+# Full list: https://docs.agentsystems.ai/deploy-agents/supported-models
