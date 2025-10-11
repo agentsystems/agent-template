@@ -16,6 +16,15 @@ version: 0.1.0
 # Description shown in the AgentSystems UI
 description: "Demo agent that returns historical events for a date and creates a story"
 
+# Repository URLs
+image_repository_url: ""
+source_repository_url: ""
+
+# Visibility and access
+listing_status: "unlisted"  # "listed" or "unlisted"
+image_repository_access: "private"  # "public" or "private"
+source_repository_access: "private"  # "public" or "private"
+
 # Models used in your agent code
 # Must match get_model() calls in main.py
 # Platform operators configure model connections before agents can run
