@@ -1,34 +1,25 @@
 # AgentSystems Agent Metadata
 #
-# This file defines your agent's metadata and requirements.
-# The AgentSystems platform reads this to:
-# - Display your agent in the UI
-# - Reference required model dependencies
-# - Route requests to your agent
+# This file defines your agent's identity and requirements.
+# Replace the placeholder values below with your own.
 
-# Publisher/organization namespace (e.g., "mycompany", "github-username")
-namespace: agentsystems
+# Your GitHub username or organization
+developer: your-org
 
-# Agent name - must be unique within your namespace
-# Used in URLs: http://gateway:18080/invoke/{name}
-name: historical-events-agent
+# Agent name - unique within your developer identity
+# This agent will be accessible at: http://localhost:18080/invoke/demo-agent
+name: demo-agent
 
-# Semantic version (major.minor.patch)
+# Version using semantic versioning (major.minor.patch)
 version: 0.1.0
 
-# Short description displayed in the AgentSystems UI
-description: "Returns historical events for a date and weaves them into a narrative story"
+# Description shown in the AgentSystems UI
+description: "Demo agent that returns historical events for a date and creates a story"
 
-# Model dependencies - list all models used in your agent code
-# The platform operator must configure these models before your agent can run
-# These should match the model IDs in your get_model() calls in main.py
+# Models used in your agent code
+# Must match get_model() calls in main.py
+# Platform operators configure model connections before agents can run
 model_dependencies:
-  - gemma3:1b
+  - gemma3:1b  # Local model, no API keys needed
 
-# Examples of other models you might use:
-# - claude-sonnet-4
-# - gpt-5-nano
-# - llama3.3:70b
-# - nova-pro
-#
-# Full list: https://docs.agentsystems.ai/deploy-agents/supported-models
+# See all supported models: https://docs.agentsystems.ai/deploy-agents/supported-models
