@@ -1,0 +1,184 @@
+# AgentSystems Agent Metadata
+#
+# This file defines your agent's identity, capabilities, and requirements.
+# Replace the placeholder values below with your own.
+
+# Your AgentSystems developer identity (lowercase, letters/numbers/hyphens/underscores)
+developer: your-org
+
+# Agent name - unique within your developer identity
+# This agent will be accessible at: http://localhost:18080/invoke/demo-agent
+name: demo-agent
+
+# Version using semantic versioning (major.minor.patch)
+version: 0.1.0
+
+# Description shown in the AgentSystems UI
+description: "Demo agent that returns historical events for a date and creates a story"
+
+# Repository URLs
+image_repository_url: ""
+source_repository_url: ""
+
+# Visibility and access
+# NOTE: The AgentSystems public index requires image_repository_access: "public"
+# to list your agent (listing_status: "listed"). Other indexes may have different policies.
+listing_status: "unlisted"  # "listed" or "unlisted"
+image_repository_access: "private"  # "public" or "private"
+source_repository_access: "private"  # "public" or "private"
+
+# ============================================================================
+# Discovery & Classification
+# ============================================================================
+
+# Context: Target audience for this agent
+# Options: "personal" | "professional"
+context: "professional"
+
+# Primary Function: What job does this agent accomplish?
+# Options: research | create | process | monitor | automate | communicate |
+#          analyze | plan | validate | assist | integrate | learn
+primary_function: "research"
+
+# Readiness Level: Maturity and stability
+# Options: "prototype" | "beta" | "production" | "deprecated"
+readiness_level: "beta"
+
+# ============================================================================
+# Compatibility Requirements
+# ============================================================================
+
+# Model Requirements: LLM models this agent uses (array of model names)
+model_requirements:
+  - gemma3:1b
+  # Example: OpenAI models
+  # - gpt-4
+  # - gpt-4-turbo
+  # - claude-3-opus
+
+# Required Integrations: Third-party services this agent needs
+required_integrations: []
+  # Example:
+  # - integration_id: "slack-oauth"
+  #   required: true
+  #   scopes:
+  #     - chat:write
+  #     - channels:read
+
+# Required Egress: Network access requirements (list of URLs)
+required_egress: []
+  # Example:
+  # - https://api.openai.com
+  # - https://api.anthropic.com
+
+# Input Types: Data formats this agent accepts
+input_types:
+  - type: "text"
+    mime_types:
+      - text/plain
+  # Example: PDF files
+  # - type: "pdf"
+  #   mime_types:
+  #     - application/pdf
+
+# Output Types: Data formats this agent produces
+output_types:
+  - type: "text"
+    mime_types:
+      - text/plain
+  # Example: JSON output
+  # - type: "json"
+  #   schema_url: "https://schema.example.com/output.json"
+
+# ============================================================================
+# Input Schema
+# ============================================================================
+
+# Input Schema: Structured parameters this agent expects
+# Used to dynamically generate forms in the UI
+input_schema:
+  date:
+    label: "Date"
+    type: "date"
+    description: "The date to look up historical events"
+    required: true
+  # Examples of other input types:
+  #
+  # email:
+  #   label: "Email Address"
+  #   type: "string"
+  #   description: "User's email address"
+  #   required: true
+  #
+  # resume:
+  #   label: "Resume"
+  #   type: "file"
+  #   description: "Upload your resume"
+  #   required: true
+  #   accept:
+  #     - application/pdf
+  #     - application/msword
+  #   max_size_mb: 10
+  #   multiple: false
+  #
+  # preferences:
+  #   label: "Preferences"
+  #   type: "string"
+  #   description: "Optional preferences"
+  #   required: false
+
+# ============================================================================
+# Facets (Flexible Metadata for Discovery)
+# ============================================================================
+
+facets:
+  # Industries this agent serves
+  industries: []
+    # Example:
+    # - legal
+    # - healthcare
+    # - finance
+
+  # Domains or data types the agent specializes in
+  domains:
+    - text
+    # Example:
+    # - pdf
+    # - email
+    # - spreadsheet
+
+  # External integrations
+  integrations: []
+    # Example:
+    # - Google Drive
+    # - Gmail
+    # - Slack
+
+  # Level of autonomy
+  autonomy: "Co-pilot"
+    # Options: "Assist" (suggest-only) | "Co-pilot" (one-click) | "Auto-pilot" (self-execute)
+
+  # Input/output modalities
+  modalities:
+    - text
+    # Example:
+    # - image
+    # - audio
+    # - video
+
+  # Latency characteristics
+  latency: "near-real-time"
+    # Options: "real-time" | "near-real-time" | "batch"
+
+  # Cost model
+  cost_profile: "free"
+    # Example: "free" | "$/task" | "$/month" | "$/hour"
+
+  # Model tooling and techniques
+  model_tooling:
+    - LLM
+    # Example:
+    # - RAG
+    # - fine-tuned
+    # - embeddings
+    # - PDF-parser
