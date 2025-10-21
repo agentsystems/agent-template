@@ -36,10 +36,16 @@ from agentsystems_toolkit import get_model
 
 load_dotenv()
 
-# Load agent metadata from agent.yaml
-meta: Dict[str, Any] = yaml.safe_load(
+# Load and merge agent metadata from agent.yaml + metadata.yaml
+agent_identity = yaml.safe_load(
     pathlib.Path(__file__).with_name("agent.yaml").read_text()
 )
+agent_metadata = yaml.safe_load(
+    pathlib.Path(__file__).with_name("metadata.yaml").read_text()
+)
+
+# Merge metadata (metadata.yaml takes precedence on conflicts)
+meta: Dict[str, Any] = {**agent_identity, **agent_metadata}
 
 app = FastAPI(title=meta.get("name", "Agent"), version=meta.get("version", "0.1.0"))
 
@@ -283,8 +289,8 @@ async def metadata() -> Dict[str, Any]:
     """
     Metadata endpoint.
 
-    Returns agent information from agent.yaml for display in the
-    AgentSystems UI and for gateway routing decisions.
+    Returns merged agent information from agent.yaml + metadata.yaml
+    for display in the AgentSystems UI and for gateway routing decisions.
 
     Returns:
         Complete agent metadata dictionary

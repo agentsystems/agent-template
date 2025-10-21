@@ -26,7 +26,8 @@ This repo is intended to be used via GitHub’s **“Use this template”** butt
 | Path / file | Purpose |
 |-------------|---------|
 | `main.py` | FastAPI app exposing `/invoke`, `/health`, `/metadata`. Contains an `invoke()` function you can customise. |
-| `agent.yaml` | Declarative metadata (e.g. `name`, `description`) read by the Gateway for routing. |
+| `agent.yaml` | Agent identity (name, description, container image, tags). |
+| `metadata.yaml` | Version-specific attributes (version, model, input schema, facets). |
 | `Dockerfile` | Slim Python 3.12 image that installs dependencies and runs the agent. |
 | `requirements.txt` | Runtime dependencies. |
 | Langfuse callback | `langfuse.langchain.CallbackHandler` pre-wired so every LangChain call is traced. |
@@ -62,8 +63,10 @@ After a few seconds check <http://localhost:8000/docs> for the swagger UI.
 
 ### Run with hot-reload (local python)
 
-1. Click **“Use this template”** on GitHub and create a new repository (e.g. `johndoe/echo-agent`).
-2. Clone your new repo and update `agent.yaml` (`name`, `description`, etc.).
+1. Click **"Use this template"** on GitHub and create a new repository (e.g. `johndoe/echo-agent`).
+2. Clone your new repo and customize:
+   - `agent.yaml` - Set your agent's identity (`name`, `description`, `container_image`, etc.)
+   - `metadata.yaml` - Set version-specific attributes (`version`, `model_dependencies`, etc.)
 3. Start the agent locally with hot-reload:
 
 ```bash
@@ -229,7 +232,9 @@ Issues and PRs are welcome – feel free to open a discussion if you need change
 
 
 1. Clone this repo (or let `agenctl init` do it for you).
-2. Edit `agent.yaml` (`name`, `description`, etc.).
+2. Edit agent identity and metadata:
+   - `agent.yaml` - Set `name`, `description`, `container_image`, etc.
+   - `metadata.yaml` - Set `version`, `model_dependencies`, `input_schema`, etc.
 3. Extend the Pydantic request/response models in `main.py` and replace the logic in `invoke()`.
 
    **Request contract**
