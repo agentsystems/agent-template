@@ -1,240 +1,32 @@
-# AgentSystems Agent Metadata
+# AgentSystems Agent Identity
 #
-# This file defines your agent's identity, capabilities, and requirements.
+# This file defines your agent's identity - the characteristics that never
+# change between versions. Version management goes in versions.yaml.
+# Version specifications go in {version}.yaml files (e.g., 0.1.0.yaml).
+#
 # Replace the placeholder values below with your own.
 
-# Your AgentSystems developer identity (lowercase, letters/numbers/hyphens/underscores)
-developer: your-org
+# ============================================================================
+# AGENT IDENTITY (Never changes)
+# ============================================================================
 
-# Agent name - unique within your developer identity
-# This agent will be accessible at: http://localhost:18080/invoke/demo-agent
-name: demo-agent
-
-# Description shown in the AgentSystems UI
+developer: your-org          # Your GitHub username or organization (must match folder name)
+name: demo-agent            # Agent name (lowercase, alphanumeric, hyphens only)
 description: "Demo agent that returns historical events for a date and creates a story"
 
-# ============================================================================
-# Repository URLs
-# ============================================================================
+# Container image reference (without tag - version tag will be auto-derived)
+container_image: ""  # e.g., docker.io/your-org/demo-agent
 
-# Container image reference (without tag - tags are specified per version below)
-container_image: ""
+# Source repository URL (optional)
+source_repository_url: ""  # e.g., https://github.com/your-org/demo-agent
 
-# Source repository URL
-source_repository_url: ""
+# High-level discovery metadata
+primary_function: research  # research | create | process | monitor | automate | analyze
 
-# ============================================================================
-# Visibility and Access (Defaults)
-# ============================================================================
+tags:
+  - demo
+  - history
 
-# NOTE: The AgentSystems public index requires container_image_access: "public"
-# to list your agent (listing_status: "listed"). Other indexes may have different policies.
-
-listing_status: "unlisted"  # "listed" or "unlisted"
-container_image_access: "private"  # "public" or "private"
-source_repository_access: "private"  # "public" or "private"
-
-# ============================================================================
-# Discovery & Classification (Defaults)
-# ============================================================================
-
-# Context: Target audience for this agent
-# Options: "personal" | "professional"
-context: "professional"
-
-# Primary Function: What job does this agent accomplish?
-# Options: research | create | process | monitor | automate | communicate |
-#          analyze | plan | validate | assist | integrate | learn
-primary_function: "research"
-
-# ============================================================================
-# Input/Output Types (Defaults)
-# ============================================================================
-
-# Input Types: Data formats this agent accepts
-input_types:
-  - type: "text"
-    mime_types:
-      - text/plain
-  # Example: PDF files
-  # - type: "pdf"
-  #   mime_types:
-  #     - application/pdf
-
-# Output Types: Data formats this agent produces
-output_types:
-  - type: "text"
-    mime_types:
-      - text/plain
-  # Example: JSON output
-  # - type: "json"
-  #   schema_url: "https://schema.example.com/output.json"
-
-# ============================================================================
-# Facets (Flexible Metadata for Discovery)
-# ============================================================================
-
-facets:
-  # Industries this agent serves
-  industries: []
-    # Example:
-    # - legal
-    # - healthcare
-    # - finance
-
-  # Domains or data types the agent specializes in
-  domains:
-    - text
-    # Example:
-    # - pdf
-    # - email
-    # - spreadsheet
-
-  # External integrations
-  integrations: []
-    # Example:
-    # - Google Drive
-    # - Gmail
-    # - Slack
-
-  # Level of autonomy
-  autonomy: "Co-pilot"
-    # Options: "Assist" (suggest-only) | "Co-pilot" (one-click) | "Auto-pilot" (self-execute)
-
-  # Input/output modalities
-  modalities:
-    - text
-    # Example:
-    # - image
-    # - audio
-    # - video
-
-  # Latency characteristics
-  latency: "near-real-time"
-    # Options: "real-time" | "near-real-time" | "batch"
-
-  # Cost model
-  cost_profile: "free"
-    # Example: "free" | "$/task" | "$/month" | "$/hour"
-
-  # Model tooling and techniques
-  model_tooling:
-    - LLM
-    # Example:
-    # - RAG
-    # - fine-tuned
-    # - embeddings
-    # - PDF-parser
-
-# ============================================================================
-# Searchable Metadata
-# ============================================================================
-
-tags: []
-  # Example:
-  # - history
-  # - storytelling
-  # - research
-
-capabilities: []
-  # Example:
-  # - Look up historical events by date
-  # - Generate creative stories from historical facts
-
-# ============================================================================
-# VERSIONS (Required - at least one version)
-# ============================================================================
-
-versions:
-  # Each version represents a specific container image and may have
-  # different dependencies, input schemas, and requirements.
-
-  - version: "0.1.0"  # Semantic version: x.y.z or x.y.z-beta.1 (used as container tag)
-    is_latest: true  # Exactly ONE version must have is_latest: true
-
-    # Override default visibility for this version (optional)
-    listing_status: "unlisted"  # "listed" or "unlisted"
-    readiness_level: "beta"  # "experimental" | "beta" | "production" | "deprecated"
-
-    # Model dependencies for this version (REQUIRED)
-    model_dependencies:
-      - gemma3:1b
-      # Example: OpenAI models
-      # - gpt-4
-      # - gpt-4-turbo
-      # - claude-3-opus
-
-    # Required network access for this version (optional)
-    required_egress: []
-      # Example:
-      # - https://api.openai.com
-      # - https://api.anthropic.com
-
-    # Input schema for this version (optional)
-    # Used to dynamically generate forms in the UI
-    input_schema:
-      date:
-        label: "Date"
-        type: "date"
-        description: "The date to look up historical events"
-        required: true
-      # Examples of other input types:
-      #
-      # email:
-      #   label: "Email Address"
-      #   type: "string"
-      #   description: "User's email address"
-      #   required: true
-      #
-      # resume:
-      #   label: "Resume"
-      #   type: "file"
-      #   description: "Upload your resume"
-      #   required: true
-      #   accept:
-      #     - application/pdf
-      #     - application/msword
-      #   max_size_mb: 10
-      #   multiple: false
-      #
-      # preferences:
-      #   label: "Preferences"
-      #   type: "string"
-      #   description: "Optional preferences"
-      #   required: false
-
-    # Release notes (optional) - supports markdown
-    release_notes: |
-      ## Initial Release
-
-      First release of the agent.
-
-  # Add more versions as you release updates:
-  #
-  # - version: "0.2.0"
-  #   is_latest: true  # Set to true, and set previous version to false
-  #   listing_status: "listed"
-  #   readiness_level: "production"
-  #
-  #   model_dependencies:
-  #     - gemma3:7b  # Upgraded model
-  #
-  #   input_schema:
-  #     date:
-  #       label: "Date"
-  #       type: "date"
-  #       description: "The date to look up historical events"
-  #       required: true
-  #     include_sources:  # New parameter
-  #       label: "Include Sources"
-  #       type: "boolean"
-  #       description: "Include source citations"
-  #       required: false
-  #
-  #   release_notes: |
-  #     ## What's New
-  #     - Upgraded to Gemma 7B for better accuracy
-  #     - Added source citations
-  #
-  #     ## Bug Fixes
-  #     - Fixed date parsing for BCE dates
+capabilities:
+  - Look up historical events by date
+  - Generate creative stories from facts
