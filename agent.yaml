@@ -17,14 +17,14 @@ version: 0.1.0
 description: "Demo agent that returns historical events for a date and creates a story"
 
 # Repository URLs
-image_repository_url: ""
+container_image: ""
 source_repository_url: ""
 
 # Visibility and access
-# NOTE: The AgentSystems public index requires image_repository_access: "public"
+# NOTE: The AgentSystems public index requires container_image_access: "public"
 # to list your agent (listing_status: "listed"). Other indexes may have different policies.
 listing_status: "unlisted"  # "listed" or "unlisted"
-image_repository_access: "private"  # "public" or "private"
+container_image_access: "private"  # "public" or "private"
 source_repository_access: "private"  # "public" or "private"
 
 # ============================================================================
