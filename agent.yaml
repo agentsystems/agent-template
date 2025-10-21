@@ -10,25 +10,32 @@ developer: your-org
 # This agent will be accessible at: http://localhost:18080/invoke/demo-agent
 name: demo-agent
 
-# Version using semantic versioning (major.minor.patch)
-version: 0.1.0
-
 # Description shown in the AgentSystems UI
 description: "Demo agent that returns historical events for a date and creates a story"
 
+# ============================================================================
 # Repository URLs
+# ============================================================================
+
+# Container image reference (without tag - tags are specified per version below)
 container_image: ""
+
+# Source repository URL
 source_repository_url: ""
 
-# Visibility and access
+# ============================================================================
+# Visibility and Access (Defaults)
+# ============================================================================
+
 # NOTE: The AgentSystems public index requires container_image_access: "public"
 # to list your agent (listing_status: "listed"). Other indexes may have different policies.
+
 listing_status: "unlisted"  # "listed" or "unlisted"
 container_image_access: "private"  # "public" or "private"
 source_repository_access: "private"  # "public" or "private"
 
 # ============================================================================
-# Discovery & Classification
+# Discovery & Classification (Defaults)
 # ============================================================================
 
 # Context: Target audience for this agent
@@ -40,36 +47,9 @@ context: "professional"
 #          analyze | plan | validate | assist | integrate | learn
 primary_function: "research"
 
-# Readiness Level: Maturity and stability
-# Options: "prototype" | "beta" | "production" | "deprecated"
-readiness_level: "beta"
-
 # ============================================================================
-# Compatibility Requirements
+# Input/Output Types (Defaults)
 # ============================================================================
-
-# Model Requirements: LLM models this agent uses (array of model names)
-model_requirements:
-  - gemma3:1b
-  # Example: OpenAI models
-  # - gpt-4
-  # - gpt-4-turbo
-  # - claude-3-opus
-
-# Required Integrations: Third-party services this agent needs
-required_integrations: []
-  # Example:
-  # - integration_id: "slack-oauth"
-  #   required: true
-  #   scopes:
-  #     - chat:write
-  #     - channels:read
-
-# Required Egress: Network access requirements (list of URLs)
-required_egress: []
-  # Example:
-  # - https://api.openai.com
-  # - https://api.anthropic.com
 
 # Input Types: Data formats this agent accepts
 input_types:
@@ -89,43 +69,6 @@ output_types:
   # Example: JSON output
   # - type: "json"
   #   schema_url: "https://schema.example.com/output.json"
-
-# ============================================================================
-# Input Schema
-# ============================================================================
-
-# Input Schema: Structured parameters this agent expects
-# Used to dynamically generate forms in the UI
-input_schema:
-  date:
-    label: "Date"
-    type: "date"
-    description: "The date to look up historical events"
-    required: true
-  # Examples of other input types:
-  #
-  # email:
-  #   label: "Email Address"
-  #   type: "string"
-  #   description: "User's email address"
-  #   required: true
-  #
-  # resume:
-  #   label: "Resume"
-  #   type: "file"
-  #   description: "Upload your resume"
-  #   required: true
-  #   accept:
-  #     - application/pdf
-  #     - application/msword
-  #   max_size_mb: 10
-  #   multiple: false
-  #
-  # preferences:
-  #   label: "Preferences"
-  #   type: "string"
-  #   description: "Optional preferences"
-  #   required: false
 
 # ============================================================================
 # Facets (Flexible Metadata for Discovery)
@@ -182,3 +125,116 @@ facets:
     # - fine-tuned
     # - embeddings
     # - PDF-parser
+
+# ============================================================================
+# Searchable Metadata
+# ============================================================================
+
+tags: []
+  # Example:
+  # - history
+  # - storytelling
+  # - research
+
+capabilities: []
+  # Example:
+  # - Look up historical events by date
+  # - Generate creative stories from historical facts
+
+# ============================================================================
+# VERSIONS (Required - at least one version)
+# ============================================================================
+
+versions:
+  # Each version represents a specific container image and may have
+  # different dependencies, input schemas, and requirements.
+
+  - version: "0.1.0"  # Semantic version: x.y.z or x.y.z-beta.1 (used as container tag)
+    is_latest: true  # Exactly ONE version must have is_latest: true
+
+    # Override default visibility for this version (optional)
+    listing_status: "unlisted"  # "listed" or "unlisted"
+    readiness_level: "beta"  # "experimental" | "beta" | "production" | "deprecated"
+
+    # Model dependencies for this version (REQUIRED)
+    model_dependencies:
+      - gemma3:1b
+      # Example: OpenAI models
+      # - gpt-4
+      # - gpt-4-turbo
+      # - claude-3-opus
+
+    # Required network access for this version (optional)
+    required_egress: []
+      # Example:
+      # - https://api.openai.com
+      # - https://api.anthropic.com
+
+    # Input schema for this version (optional)
+    # Used to dynamically generate forms in the UI
+    input_schema:
+      date:
+        label: "Date"
+        type: "date"
+        description: "The date to look up historical events"
+        required: true
+      # Examples of other input types:
+      #
+      # email:
+      #   label: "Email Address"
+      #   type: "string"
+      #   description: "User's email address"
+      #   required: true
+      #
+      # resume:
+      #   label: "Resume"
+      #   type: "file"
+      #   description: "Upload your resume"
+      #   required: true
+      #   accept:
+      #     - application/pdf
+      #     - application/msword
+      #   max_size_mb: 10
+      #   multiple: false
+      #
+      # preferences:
+      #   label: "Preferences"
+      #   type: "string"
+      #   description: "Optional preferences"
+      #   required: false
+
+    # Release notes (optional) - supports markdown
+    release_notes: |
+      ## Initial Release
+
+      First release of the agent.
+
+  # Add more versions as you release updates:
+  #
+  # - version: "0.2.0"
+  #   is_latest: true  # Set to true, and set previous version to false
+  #   listing_status: "listed"
+  #   readiness_level: "production"
+  #
+  #   model_dependencies:
+  #     - gemma3:7b  # Upgraded model
+  #
+  #   input_schema:
+  #     date:
+  #       label: "Date"
+  #       type: "date"
+  #       description: "The date to look up historical events"
+  #       required: true
+  #     include_sources:  # New parameter
+  #       label: "Include Sources"
+  #       type: "boolean"
+  #       description: "Include source citations"
+  #       required: false
+  #
+  #   release_notes: |
+  #     ## What's New
+  #     - Upgraded to Gemma 7B for better accuracy
+  #     - Added source citations
+  #
+  #     ## Bug Fixes
+  #     - Fixed date parsing for BCE dates
