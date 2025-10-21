@@ -1,13 +1,14 @@
 # AgentSystems Agent Identity
 #
-# This file defines your agent's identity - the characteristics that never
-# change between versions. Version management goes in versions.yaml.
-# Version specifications go in {version}.yaml files (e.g., 0.1.0.yaml).
+# This file defines your agent's identity - core characteristics like
+# name, description, and container image location.
+#
+# Version-specific attributes (model, schema, etc.) go in metadata.yaml.
 #
 # Replace the placeholder values below with your own.
 
 # ============================================================================
-# AGENT IDENTITY (Never changes)
+# AGENT IDENTITY
 # ============================================================================
 
 developer: your-org          # Your GitHub username or organization (must match folder name)

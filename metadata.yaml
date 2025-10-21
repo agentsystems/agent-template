@@ -1,16 +1,16 @@
-# AgentSystems Agent Version Specification
+# AgentSystems Agent Metadata
 #
-# This file defines a complete, self-contained specification for version 0.1.0.
-# All behavioral characteristics can differ between versions.
+# This file contains version-specific attributes for your agent.
+# These can change between releases as you upgrade models, add features, etc.
 #
-# Filename MUST match the version field (0.1.0.yaml contains version: "0.1.0")
+# When you publish to the agent-index, this file becomes {version}.yaml
+# (e.g., 0.1.0.yaml, 0.2.0.yaml) to maintain version history.
 
 # ============================================================================
 # VERSION METADATA
 # ============================================================================
 
 version: "0.1.0"  # Semantic version: x.y.z or x.y.z-beta.1 (used as container image tag)
-                  # Must match filename (0.1.0.yaml)
 
 # ============================================================================
 # MATURITY & ACCESS
