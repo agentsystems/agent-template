@@ -240,10 +240,11 @@ COPY --from=builder /app/licenses /app/licenses
 # Create version file for runtime access
 RUN echo "{\"version\": \"${VERSION}\", \"build_timestamp\": \"${BUILD_TIMESTAMP}\", \"git_commit\": \"${GIT_COMMIT}\"}" > /app/version.json
 
-# OCI labels for license metadata
-LABEL org.opencontainers.image.title="AgentSystems Agent" \
+# OCI labels for container metadata
+# TODO: Customize title and vendor for your agent
+LABEL org.opencontainers.image.title="Your Agent Name" \
       org.opencontainers.image.description="AI agent with license attribution" \
-      org.opencontainers.image.vendor="AgentSystems" \
+      org.opencontainers.image.vendor="Your Organization" \
       org.opencontainers.image.licenses="Apache-2.0" \
       org.opencontainers.image.license.files="/app/licenses" \
       org.opencontainers.image.license.verification="/app/licenses/ATTRIBUTION_CHECKSUMS.txt" \
