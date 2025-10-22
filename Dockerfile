@@ -228,6 +228,7 @@ COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/pytho
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /app/*.py /app/
 COPY --from=builder /app/agent.yaml /app/
+COPY --from=builder /app/metadata.yaml /app/
 COPY --from=builder /app/requirements.txt /app/
 
 # Copy project LICENSE
