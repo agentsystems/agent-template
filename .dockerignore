@@ -72,3 +72,6 @@ tests/
 *.temp
 .env.local
 .env.*.local
+
+# Environment files
+.env
