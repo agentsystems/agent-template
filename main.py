@@ -38,7 +38,7 @@ load_dotenv()
 app = FastAPI(
     title="demo-agent",
     description="Demo agent that returns historical events for a date and creates a story",
-    version="0.1.0"
+    version="0.1.0",
 )
 
 
