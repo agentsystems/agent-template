@@ -11,13 +11,10 @@ To customize this agent, modify:
 Required endpoints (do not remove):
   POST /invoke    - Main agent logic
   GET  /health    - Container health check
-  GET  /metadata  - Agent information
 """
 
 from datetime import datetime, timezone
-from typing import TypedDict, List, Dict, Any
-import pathlib
-import yaml
+from typing import TypedDict, List, Dict
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
@@ -36,18 +33,13 @@ from agentsystems_toolkit import get_model
 
 load_dotenv()
 
-# Load and merge agent metadata from agent.yaml + metadata.yaml
-agent_identity = yaml.safe_load(
-    pathlib.Path(__file__).with_name("agent.yaml").read_text()
+# Agent metadata is embedded in Dockerfile OCI labels and agent-index
+# No metadata files needed in the container
+app = FastAPI(
+    title="demo-agent",
+    description="Demo agent that returns historical events for a date and creates a story",
+    version="0.1.0",
 )
-agent_metadata = yaml.safe_load(
-    pathlib.Path(__file__).with_name("metadata.yaml").read_text()
-)
-
-# Merge metadata (metadata.yaml takes precedence on conflicts)
-meta: Dict[str, Any] = {**agent_identity, **agent_metadata}
-
-app = FastAPI(title=meta.get("name", "Agent"), version=meta.get("version", "0.1.0"))
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -281,18 +273,4 @@ async def health() -> Dict[str, str]:
     Returns:
         Status and version information
     """
-    return {"status": "ok", "version": meta.get("version", "0.1.0")}
-
-
-@app.get("/metadata")
-async def metadata() -> Dict[str, Any]:
-    """
-    Metadata endpoint.
-
-    Returns merged agent information from agent.yaml + metadata.yaml
-    for display in the AgentSystems UI and for gateway routing decisions.
-
-    Returns:
-        Complete agent metadata dictionary
-    """
-    return meta
+    return {"status": "ok", "version": "0.1.0"}

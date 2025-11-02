@@ -3,10 +3,15 @@
 # Provides license attribution for third-party software dependencies
 # -----------------------------------------------------------------------------
 
-# Build args for version injection
+# Build args for version and metadata injection
 ARG VERSION=unknown
 ARG BUILD_TIMESTAMP=unknown
 ARG GIT_COMMIT=unknown
+ARG AGENT_NAME=agent
+ARG AGENT_DESCRIPTION="AI agent"
+ARG AGENT_DEVELOPER=unknown
+ARG AGENT_PRIMARY_FUNCTION=unknown
+ARG SOURCE_URL=https://github.com/agentsystems/agent-template
 
 # -----------------------------------------------------------------------------
 # Builder stage – install deps, build app, and collect ALL licenses
@@ -208,10 +213,15 @@ RUN pip uninstall -y pip-licenses || true
 # -----------------------------------------------------------------------------
 FROM python:3.13-slim
 
-# Re-declare args for final stage
+# Re-declare args for final stage (needed for LABEL and RUN commands)
 ARG VERSION=unknown
 ARG BUILD_TIMESTAMP=unknown
 ARG GIT_COMMIT=unknown
+ARG AGENT_NAME=agent
+ARG AGENT_DESCRIPTION="AI agent"
+ARG AGENT_DEVELOPER=unknown
+ARG AGENT_PRIMARY_FUNCTION=unknown
+ARG SOURCE_URL=https://github.com/agentsystems/agent-template
 
 ENV PYTHONUNBUFFERED=1
 WORKDIR /app
@@ -227,8 +237,6 @@ RUN apt-get update \
 COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /app/*.py /app/
-COPY --from=builder /app/agent.yaml /app/
-COPY --from=builder /app/metadata.yaml /app/
 COPY --from=builder /app/requirements.txt /app/
 
 # Copy project LICENSE
@@ -240,18 +248,23 @@ COPY --from=builder /app/licenses /app/licenses
 # Create version file for runtime access
 RUN echo "{\"version\": \"${VERSION}\", \"build_timestamp\": \"${BUILD_TIMESTAMP}\", \"git_commit\": \"${GIT_COMMIT}\"}" > /app/version.json
 
-# OCI labels for container metadata
-# TODO: Customize title and vendor for your agent
-LABEL org.opencontainers.image.title="Your Agent Name" \
-      org.opencontainers.image.description="AI agent with license attribution" \
-      org.opencontainers.image.vendor="Your Organization" \
+# OCI standard labels for container metadata
+# See: https://github.com/opencontainers/image-spec/blob/main/annotations.md
+LABEL org.opencontainers.image.title="${AGENT_NAME}" \
+      org.opencontainers.image.description="${AGENT_DESCRIPTION}" \
+      org.opencontainers.image.vendor="${AGENT_DEVELOPER}" \
+      org.opencontainers.image.authors="${AGENT_DEVELOPER}" \
       org.opencontainers.image.licenses="Apache-2.0" \
       org.opencontainers.image.license.files="/app/licenses" \
       org.opencontainers.image.license.verification="/app/licenses/ATTRIBUTION_CHECKSUMS.txt" \
-      org.opencontainers.image.source="https://github.com/agentsystems/agent-template" \
+      org.opencontainers.image.source="${SOURCE_URL}" \
+      org.opencontainers.image.url="${SOURCE_URL}" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.created="${BUILD_TIMESTAMP}" \
-      org.opencontainers.image.revision="${GIT_COMMIT}"
+      org.opencontainers.image.revision="${GIT_COMMIT}" \
+      ai.agentsystems.agent.name="${AGENT_NAME}" \
+      ai.agentsystems.agent.developer="${AGENT_DEVELOPER}" \
+      ai.agentsystems.agent.primary-function="${AGENT_PRIMARY_FUNCTION}"
 
 # Create non-root user for security
 RUN useradd -u 1001 -m appuser

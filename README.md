@@ -8,10 +8,10 @@
 
 > This is the **reference agent template** for AgentSystems. See the [main repository](https://github.com/agentsystems/agentsystems) for platform overview and documentation.
 
-A minimal, batteries-included starter for building containerised AI agents that plug into the [Agent Systems](https://github.com/agentsystems) platform.
+A minimal starter for building containerized AI agents that plug into the [Agent Systems](https://github.com/agentsystems) platform.
 
-*   Built on FastAPI + LangChain
-*   Comes with a Dockerfile and a `build_and_release.sh` wrapper
+*   Built on FastAPI + LangChain + LangGraph
+*   Uses OCI standard labels for container metadata
 *   No version tags or Docker image are published here – **this repo is a template**, not a distributable agent
 
 
@@ -25,12 +25,12 @@ This repo is intended to be used via GitHub’s **“Use this template”** butt
 
 | Path / file | Purpose |
 |-------------|---------|
-| `main.py` | FastAPI app exposing `/invoke`, `/health`, `/metadata`. Contains an `invoke()` function you can customise. |
-| `agent.yaml` | Agent identity (name, description, container image, tags). |
-| `metadata.yaml` | Version-specific attributes (version, model, input schema, facets). |
-| `Dockerfile` | Slim Python 3.12 image that installs dependencies and runs the agent. |
+| `main.py` | FastAPI app exposing `/invoke` and `/health` endpoints. Contains an `invoke()` function you can customize. |
+| `Dockerfile` | Multi-stage Python 3.13 image with OCI labels, license attribution, and healthcheck. |
 | `requirements.txt` | Runtime dependencies. |
-| Langfuse callback | `langfuse.langchain.CallbackHandler` pre-wired so every LangChain call is traced. |
+| Langfuse tracing | Pre-configured via `agentsystems-toolkit` for observability. |
+
+**Note**: Agent metadata (model dependencies, egress requirements, setup instructions) is defined in the [agent-index](https://github.com/agentsystems/agent-index) when you publish your agent, not in the container itself.
 
 ---
 
@@ -63,10 +63,11 @@ After a few seconds check <http://localhost:8000/docs> for the swagger UI.
 
 ### Run with hot-reload (local python)
 
-1. Click **"Use this template"** on GitHub and create a new repository (e.g. `johndoe/echo-agent`).
-2. Clone your new repo and customize:
-   - `agent.yaml` - Set your agent's identity (`name`, `description`, `container_image`, etc.)
-   - `metadata.yaml` - Set version-specific attributes (`version`, `model_dependencies`, etc.)
+1. Click **"Use this template"** on GitHub and create a new repository (e.g. `johndoe/my-agent`).
+2. Clone your new repo and customize `main.py`:
+   - Update the FastAPI app metadata (lines 38-42)
+   - Modify the `State`, `InvokeRequest`, and `InvokeResponse` models
+   - Implement your agent logic in the graph nodes
 3. Start the agent locally with hot-reload:
 
 ```bash
@@ -91,22 +92,31 @@ HEALTHCHECK --interval=10s --retries=3 CMD curl -sf http://localhost:${PORT}/hea
 The template exposes a `GET /health` endpoint that returns 200, so the example healthcheck will work with the default app.
 
 ---
-## Build & release a Docker image
+## Build a Docker image
 
-Use the wrapper script to build (and optionally push) a versioned multi-arch image:
+Build your agent image with standard Docker commands:
 
 ```bash
-./build_and_release.sh \
-  --image johndoe/echo-agent \
-  --version 0.1.0 \
-  --push          # omit --push to build locally only
+docker build -t yourname/my-agent:0.1.0 .
 ```
 
-What it does:
+To embed metadata in OCI labels (recommended):
 
-* Builds the container image and tags it `0.1.0` (plus `latest` if no suffix)
-* Pushes to Docker Hub when `--push` is present
-* Creates a Git tag **only** when you also pass `--git-tag`
+```bash
+docker build \
+  --build-arg AGENT_NAME="my-agent" \
+  --build-arg AGENT_DESCRIPTION="My custom agent" \
+  --build-arg AGENT_DEVELOPER="yourname" \
+  --build-arg VERSION="0.1.0" \
+  -t yourname/my-agent:0.1.0 \
+  .
+```
+
+Then push to your registry:
+
+```bash
+docker push yourname/my-agent:0.1.0
+```
 
 ---
 
@@ -214,12 +224,15 @@ agentsystems artifacts-path {thread-id} result.txt
 
 ---
 
-## Release checklist
+## Publishing Your Agent
 
-1. Update `version` label (if you tag images).
-2. `docker build` & push to registry.
-3. Update the image tag in the deployment manifests.
-4. Run `make restart` (compose) or `helm upgrade` (k8s) to pick up the change.
+To make your agent discoverable in the AgentSystems platform:
+
+1. Build and push your Docker image to a container registry
+2. Publish metadata to the [agent-index](https://github.com/agentsystems/agent-index)
+3. Users can discover and install your agent via the platform UI
+
+See the [AgentSystems documentation](https://docs.agentsystems.ai) for detailed publishing instructions.
 
 ---
 
@@ -230,12 +243,12 @@ Issues and PRs are welcome – feel free to open a discussion if you need change
 
 ## Getting Started (local)
 
-
-1. Clone this repo (or let `agenctl init` do it for you).
-2. Edit agent identity and metadata:
-   - `agent.yaml` - Set `name`, `description`, `container_image`, etc.
-   - `metadata.yaml` - Set `version`, `model_dependencies`, `input_schema`, etc.
-3. Extend the Pydantic request/response models in `main.py` and replace the logic in `invoke()`.
+1. Use this template to create your own repository.
+2. Customize `main.py`:
+   - Update FastAPI metadata
+   - Define your request/response models
+   - Implement your agent logic
+3. Build and run locally (see sections above).
 
    **Request contract**
    - Client must include `Authorization: Bearer <token>` header (any placeholder for now).
